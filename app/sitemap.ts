@@ -4,6 +4,8 @@ import { collection, getDocs } from 'firebase/firestore';
 
 // This ensures the sitemap regenerates every hour to capture new products
 export const revalidate = 3600;
+// Mark as dynamic to prevent prerendering issues
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ⚠️ REPLACE with your actual live domain
