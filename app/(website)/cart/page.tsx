@@ -3,10 +3,12 @@
 import { useCart, CartItem } from '@/src/context/CartContext';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Trash2, Plus, Minus } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import Navbar from '@/src/components/header';
+import Footer from '@/src/components/footer';
 
 export default function CartPage() {
   const router = useRouter();
@@ -63,13 +65,75 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
+      <>
+        <Navbar />
+        <motion.div 
+          className="min-h-screen bg-white"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="max-w-7xl mx-auto px-4 py-12">
+            <motion.button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-gray-700 hover:text-black mb-8 transition"
+              whileHover={{ x: -5 }}
+            >
+              <ArrowLeft size={20} />
+              <span>Back</span>
+            </motion.button>
+            <motion.h1 
+              className="text-4xl font-bold mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              SHOPPING BAG
+            </motion.h1>
+            <motion.div 
+              className="text-center py-20"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <p className="text-gray-600 text-lg mb-6">Your cart is empty</p>
+              <motion.button
+                onClick={() => router.push('/products')}
+                className="inline-block bg-black text-white font-semibold py-3 px-8 hover:bg-gray-800"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                CONTINUE SHOPPING
+              </motion.button>
+            </motion.div>
+          </div>
+        </motion.div>
+        <Footer />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
       <motion.div 
         className="min-h-screen bg-white"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Back Button */}
+          <motion.button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-gray-700 hover:text-black mb-8 transition"
+            whileHover={{ x: -5 }}
+          >
+            <ArrowLeft size={20} />
+            <span>Back</span>
+          </motion.button>
+
+          {/* Header */}
           <motion.h1 
             className="text-4xl font-bold mb-8"
             initial={{ opacity: 0, y: 20 }}
@@ -78,46 +142,8 @@ export default function CartPage() {
           >
             SHOPPING BAG
           </motion.h1>
-          <motion.div 
-            className="text-center py-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <p className="text-gray-600 text-lg mb-6">Your cart is empty</p>
-            <motion.button
-              onClick={() => router.push('/products')}
-              className="inline-block bg-black text-white font-semibold py-3 px-8 hover:bg-gray-800"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              CONTINUE SHOPPING
-            </motion.button>
-          </motion.div>
-        </div>
-      </motion.div>
-    );
-  }
 
-  return (
-    <motion.div 
-      className="min-h-screen bg-white"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.h1 
-          className="text-4xl font-bold mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          SHOPPING BAG
-        </motion.h1>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section - Products */}
           <div className="lg:col-span-2">
             <motion.div 
@@ -315,5 +341,7 @@ export default function CartPage() {
         </div>
       </div>
     </motion.div>
+      <Footer />
+    </>
   );
 }

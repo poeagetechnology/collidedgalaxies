@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Albert_Sans } from 'next/font/google';
 import { Product } from '@/src/server/models/product.model';
 import { getProductUrl, getCurrentPrice, subscribeToNewArrivals } from '@/src/server/services/product.service';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const albertSans = Albert_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
 
@@ -114,13 +114,14 @@ export default function NewThisWeek() {
                     {/* Plus Button */}
                     <Link href={productUrl}>
                       <button
-                        className={`w-10 h-10 flex items-center justify-center rounded border transition ${
+                        disabled={isOutOfStock}
+                        className={`w-full py-2 px-3 rounded border font-medium text-sm transition ${
                           isOutOfStock
-                            ? 'bg-gray-300 border-gray-300 cursor-not-allowed opacity-50'
-                            : 'bg-white border-gray-300 hover:border-black hover:bg-black hover:text-white'
+                            ? 'bg-gray-300 border-gray-300 cursor-not-allowed opacity-50 text-gray-600'
+                            : 'bg-white border-gray-300 text-gray-900 hover:border-black hover:bg-black hover:text-white'
                         }`}
                       >
-                        <Plus size={20} />
+                        View Product
                       </button>
                     </Link>
                   </div>

@@ -229,88 +229,92 @@ export default function OrdersPage() {
 								</div>
 							)}
 
-							<ul className="space-y-4">
-								{displayedOrders.map((order) => {
-									const created = order.createdAt && typeof order.createdAt.toDate === "function"
-										? order.createdAt.toDate()
-										: order.createdAt && order.createdAt.seconds
-											? new Date(order.createdAt.seconds * 1000)
-											: null;
+							{displayedOrders.length > 0 && (
+								<section>
+									<ul className="space-y-4">
+										{displayedOrders.map((order) => {
+											const created = order.createdAt && typeof order.createdAt.toDate === "function"
+												? order.createdAt.toDate()
+												: order.createdAt && order.createdAt.seconds
+													? new Date(order.createdAt.seconds * 1000)
+													: null;
 
-									const statusInfo = getStatusInfo(order.status);
+											const statusInfo = getStatusInfo(order.status);
 
-									return (
-										<li key={order.id} className="border border-gray-300 p-6 shadow-sm">
-											<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-												<div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-													<div>
-														<div className="text-sm text-gray-500 mb-1">Order ID</div>
-														<div className="font-semibold text-base">
-															{order.razorpayOrderId || order.id}
+											return (
+												<li key={order.id} className="border border-gray-300 p-6 shadow-sm">
+													<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+														<div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+															<div>
+																<div className="text-sm text-gray-500 mb-1">Order ID</div>
+																<div className="font-semibold text-base">
+																	{order.razorpayOrderId || order.id}
+																</div>
+															</div>
+															<div>
+																<div className="text-sm text-gray-500 mb-1">Order Date</div>
+																<div className="text-sm text-gray-800">
+																	{created ? created.toLocaleString('en-IN', {
+																		year: 'numeric',
+																		month: 'short',
+																		day: 'numeric',
+																		hour: '2-digit',
+																		minute: '2-digit'
+																	}) : "—"}
+																</div>
+															</div>
+															<div>
+																<div className="text-sm text-gray-500 mb-1">Amount</div>
+																<div className="font-semibold text-base">
+																	₹{Number(order.amount || 0).toFixed(2)}
+																</div>
+															</div>
 														</div>
-													</div>
-													<div>
-														<div className="text-sm text-gray-500 mb-1">Order Date</div>
-														<div className="text-sm text-gray-800">
-															{created ? created.toLocaleString('en-IN', {
-																year: 'numeric',
-																month: 'short',
-																day: 'numeric',
-																hour: '2-digit',
-																minute: '2-digit'
-															}) : "—"}
-														</div>
-													</div>
-													<div>
-														<div className="text-sm text-gray-500 mb-1">Amount</div>
-														<div className="font-semibold text-base">
-															₹{Number(order.amount || 0).toFixed(2)}
-														</div>
-													</div>
-												</div>
 
-												<div className="flex items-center gap-4">
-													<div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-														<span className={`px-3 py-1 text-xs font-medium ${statusInfo.color}`}>
-															{statusInfo.label}
-														</span>
-														{order.paymentStatus && (
-															<span
-																className={`text-xs px-2 py-1 ${order.paymentStatus === "paid"
-																	? "bg-green-100 text-green-700"
-																	: "bg-red-100 text-red-700"
-																	}`}
+														<div className="flex items-center gap-4">
+															<div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+																<span className={`px-3 py-1 text-xs font-medium ${statusInfo.color}`}>
+																	{statusInfo.label}
+																</span>
+																{order.paymentStatus && (
+																	<span
+																		className={`text-xs px-2 py-1 ${order.paymentStatus === "paid"
+																			? "bg-green-100 text-green-700"
+																			: "bg-red-100 text-red-700"
+																			}`}
+																	>
+																		{order.paymentStatus === "paid" ? "PAID" : "PAYMENT PENDING"}
+																	</span>
+																)}
+															</div>
+															<button
+																onClick={() => handleTrackOrder(order)}
+																className="px-4 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
 															>
-																{order.paymentStatus === "paid" ? "PAID" : "PAYMENT PENDING"}
-															</span>
-														)}
+																Track Order
+															</button>
+														</div>
 													</div>
-													<button
-														onClick={() => handleTrackOrder(order)}
-														className="px-4 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
-													>
-														Track Order
-													</button>
-												</div>
-											</div>
 
-											{/* Show tracking number if available */}
-											{order.trackingNumber && (
-												<div className="mt-4 pt-4 border-t border-gray-200">
-													<div className="text-sm text-gray-500">Tracking Number</div>
-													<div className="font-mono text-sm font-medium mt-1">
-														{order.trackingNumber}
-													</div>
-												</div>
-											)}
-										</li>
-									);
-								})}
-							</ul>
-						</section>
+													{/* Show tracking number if available */}
+													{order.trackingNumber && (
+														<div className="mt-4 pt-4 border-t border-gray-200">
+															<div className="text-sm text-gray-500">Tracking Number</div>
+															<div className="font-mono text-sm font-medium mt-1">
+																{order.trackingNumber}
+															</div>
+														</div>
+													)}
+												</li>
+											);
+										})}
+									</ul>
+								</section>
+							)}
+						</motion.section>
 					)}
 				</div>
-			</main>
+			</motion.main>
 
 			{/* Track Order Modal */}
 			<TrackOrderModal
