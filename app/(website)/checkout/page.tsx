@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Albert_Sans } from "next/font/google";
+import { motion } from "framer-motion";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
 import Image from "next/image";
@@ -425,18 +426,42 @@ export default function Checkout() {
   return (
     <>
       <Navbar />
-      <div className={`min-h-screen bg-gray-50 ${albertSans.className}`}>
+      <motion.div 
+        className={`min-h-screen bg-gray-50 ${albertSans.className}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10">
           {/* Back Button */}
-          <button onClick={() => window.history.back()} className="mb-6 text-gray-600 hover:text-black flex items-center gap-1">
+          <motion.button 
+            onClick={() => window.history.back()} 
+            className="mb-6 text-gray-600 hover:text-black flex items-center gap-1"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            whileHover={{ x: -5 }}
+          >
             <span>←</span>
-          </button>
+          </motion.button>
 
           {/* Header */}
-          <h1 className="text-4xl font-bold mb-8">CHECKOUT</h1>
+          <motion.h1 
+            className="text-4xl font-bold mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            CHECKOUT
+          </motion.h1>
 
           {/* Tabs */}
-          <div className="flex gap-8 mb-8 border-b border-gray-300">
+          <motion.div 
+            className="flex gap-8 mb-8 border-b border-gray-300"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <button onClick={() => setCurrentTab('information')} className={`pb-4 font-semibold text-sm tracking-wide transition ${currentTab === 'information' ? 'text-black border-b-2 border-black' : 'text-gray-400'}`}>
               INFORMATION
             </button>
@@ -446,7 +471,7 @@ export default function Checkout() {
             <button onClick={() => setCurrentTab('payment')} className={`pb-4 font-semibold text-sm tracking-wide transition ${currentTab === 'payment' ? 'text-black border-b-2 border-black' : 'text-gray-400'}`}>
               PAYMENT
             </button>
-          </div>
+          </motion.div>
 
           {/* Main Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -696,7 +721,7 @@ export default function Checkout() {
             initialData={editingIndex !== null ? addresses[editingIndex] : undefined}
           />
         </div>
-      </div>
+      </motion.div>
       <Footer />
     </>
   );

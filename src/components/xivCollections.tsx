@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Albert_Sans } from 'next/font/google';
 import { Product } from '@/src/server/models/product.model';
 import { getProductUrl, getCurrentPrice, subscribeToNewArrivals } from '@/src/server/services/product.service';
@@ -73,25 +74,54 @@ export default function XIVCollections() {
   };
 
   return (
-    <section className={`w-full bg-gray-50 py-16 ${albertSans.className}`}>
+    <motion.section 
+      className={`w-full bg-gray-50 py-16 ${albertSans.className}`}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: false, margin: "-50px" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
-        <div className="mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-2">
+        <motion.div 
+          className="mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: false, margin: "-50px" }}
+        >
+          <motion.h2 
+            className="text-4xl md:text-5xl font-bold leading-tight mb-2"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: false, margin: "-50px" }}
+          >
             XIV
             <br />
             COLLECTIONS
             <br />
             23-24
-          </h2>
-        </div>
+          </motion.h2>
+        </motion.div>
 
         {/* Filters and Sort */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+        <motion.div 
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          viewport={{ once: false, margin: "-50px" }}
+        >
           {/* Category Filters */}
-          <div className="flex gap-4 md:gap-8 flex-wrap">
+          <motion.div 
+            className="flex gap-4 md:gap-8 flex-wrap"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             {(['ALL', 'Men', 'Women', 'KID'] as FilterType[]).map((filter) => (
-              <button
+              <motion.button
                 key={filter}
                 onClick={() => setSelectedFilter(filter)}
                 className={`text-sm md:text-base font-medium transition-all ${
@@ -99,14 +129,21 @@ export default function XIVCollections() {
                     ? 'text-black border-b-2 border-black pb-1'
                     : 'text-gray-500 hover:text-black'
                 }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 {filter}
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
 
           {/* Sort Options */}
-          <div className="flex gap-4 md:gap-6 flex-wrap md:flex-nowrap">
+          <motion.div 
+            className="flex gap-4 md:gap-6 flex-wrap md:flex-nowrap"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="flex items-center gap-1 text-xs md:text-sm cursor-pointer group">
               <span className="font-medium">Filter(s)</span>
               <ChevronDown size={16} className="group-hover:rotate-180 transition-transform" />
@@ -124,15 +161,35 @@ export default function XIVCollections() {
               <option value="price-low">Less to more</option>
               <option value="price-high">More to Less</option>
             </select>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12">
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12"
+          initial="hidden"
+          whileInView="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2,
+              },
+            },
+          }}
+          viewport={{ once: false, margin: "-50px" }}
+        >
           {displayedProducts.length === 0 ? (
-            <p className="col-span-full text-center text-lg text-gray-600">
+            <motion.p 
+              className="col-span-full text-center text-lg text-gray-600"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+            >
               No products found.
-            </p>
+            </motion.p>
           ) : (
             displayedProducts.map((product) => {
               const currentPrice = getCurrentPrice(product);
@@ -175,7 +232,6 @@ export default function XIVCollections() {
                     <h3 className="text-base font-medium text-gray-900 mb-3">
                       {product.title}
                     </h3>
-
                     {/* Price */}
                     <div className="flex items-center gap-2">
                       <p className="text-base font-semibold text-gray-900">
@@ -192,7 +248,7 @@ export default function XIVCollections() {
               );
             })
           )}
-        </div>
+        </motion.div>
 
         {/* Load More Button */}
         {displayCount < filteredProducts.length && (
@@ -210,6 +266,6 @@ export default function XIVCollections() {
           </div>
         )}
       </div>
-    </section>
+    </motion.section>
   );
 }

@@ -3,6 +3,7 @@
 import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { Albert_Sans } from "next/font/google";
+import { motion } from "framer-motion";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
 import { useAuth, db } from "../../../src/context/authProvider";
@@ -226,57 +227,101 @@ export default function ProfilePage() {
 	return (
 		<>
 			<Navbar />
-			<main className={`min-h-screen bg-white ${albertSans.className}`}>
+			<motion.main 
+				className={`min-h-screen bg-white ${albertSans.className}`}
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.5 }}
+			>
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-10">
 					{/* Header */}
-					<div className="flex flex-col md:flex-row justify-between items-center w-full pb-14">
-						<h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-2 md:mb-0">
+					<motion.div 
+						className="flex flex-col md:flex-row justify-between items-center w-full pb-14"
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+					>
+						<motion.h1 
+							className="text-3xl md:text-4xl font-semibold leading-tight mb-2 md:mb-0"
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.5, delay: 0.1 }}
+						>
 							My Profile
-						</h1>
-						<p className="text-base md:text-lg text-gray-700 text-center md:w-[300px] md:text-right">
+						</motion.h1>
+						<motion.p 
+							className="text-base md:text-lg text-gray-700 text-center md:w-[300px] md:text-right"
+							initial={{ opacity: 0, x: 20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.5, delay: 0.2 }}
+						>
 							Keep your personal info, contact details, and shipping addresses up to date for smoother checkouts and faster deliveries.
-						</p>
-					</div>
+						</motion.p>
+					</motion.div>
 
 					<div className="flex flex-col md:flex-row gap-8 md:items-start">
 						{/* Sidebar */}
-						<div className="flex flex-col gap-8">
-							<aside className={`w-full md:w-64 bg-gray-50 p-6 space-y-2 h-auto md:h-[200px] ${activeSection ? 'hidden md:block' : 'block'
-								}`}>
+						<motion.div 
+							className="flex flex-col gap-8"
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.5, delay: 0.3 }}
+						>
+							<motion.aside 
+								className={`w-full md:w-64 bg-gray-50 p-6 space-y-2 h-auto md:h-[200px] ${activeSection ? 'hidden md:block' : 'block'
+									}`}
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.5 }}
+							>
 								<h2 className="text-sm font-bold uppercase mb-4 text-gray-700">
 									ACCOUNT OVERVIEW
 								</h2>
 
-								<button
+								<motion.button
 									onClick={() => setActiveSection("personal")}
 									className={`w-full text-left px-4 py-3 cursor-pointer flex items-center justify-between hover:bg-gray-100 transition ${activeSection === "personal" ? "bg-white border-l-4 border-black font-medium" : ""
 										}`}
+									whileHover={{ x: 5 }}
+									whileTap={{ scale: 0.95 }}
 								>
 									<span>Personal Information</span>
 									<span>›</span>
-								</button>
+								</motion.button>
 
-								<button
+								<motion.button
 									onClick={() => setActiveSection("address")}
 									className={`w-full text-left px-4 py-3 cursor-pointer flex items-center justify-between hover:bg-gray-100 transition ${activeSection === "address" ? "bg-white border-l-4 border-black font-medium" : ""
 										}`}
+									whileHover={{ x: 5 }}
+									whileTap={{ scale: 0.95 }}
 								>
 									<span>Address Book</span>
 									<span>›</span>
-								</button>
-							</aside>
+								</motion.button>
+							</motion.aside>
 
-							<aside className="w-full hidden md:block md:w-64 bg-gray-50 p-6 space-y-2 h-auto">
+							<motion.aside 
+								className="w-full hidden md:block md:w-64 bg-gray-50 p-6 space-y-2 h-auto"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.5, delay: 0.1 }}
+							>
 								<h2 className="text-sm font-bold uppercase mb-4 text-gray-700">
 									Help & Policies
 								</h2>
 
-								<Link
-									href="/policies/shipping"
-									className="w-full text-left px-4 py-3 cursor-pointer flex items-center justify-between hover:bg-gray-100 transition"
+								<motion.div
+									whileHover={{ x: 5 }}
+									transition={{ duration: 0.2 }}
 								>
-									<span>Shipping Policy</span>
-								</Link>
+									<Link
+										href="/policies/shipping"
+										className="w-full text-left px-4 py-3 cursor-pointer flex items-center justify-between hover:bg-gray-100 transition"
+									>
+										<span>Shipping Policy</span>
+									</Link>
+								</motion.div>
 
 								<Link
 									href="/policies/return-and-refund"
@@ -298,8 +343,8 @@ export default function ProfilePage() {
 								>
 									<span>Terms & Conditions</span>
 								</Link>
-							</aside>
-						</div>
+							</motion.aside>
+						</motion.div>
 
 						{/* Main Content */}
 						<div className={`flex-1 ${activeSection ? 'block' : 'hidden md:block'}`}>
@@ -469,7 +514,7 @@ export default function ProfilePage() {
 					onSave={handleSaveProfile}
 					initialData={profileData}
 				/>
-			</main>
+			</motion.main>
 			<Footer />
 		</>
 	);

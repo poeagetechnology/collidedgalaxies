@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { Albert_Sans } from "next/font/google";
+import { motion } from "framer-motion";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
 
@@ -88,30 +89,68 @@ export default function ContactUs() {
     <>
       <Navbar />
 
-      <section
+      <motion.section
         id="contact"
         className={`min-h-screen bg-white ${albertSans.className}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-10 md:pt-30 md:pb-10">
-          <div className="flex flex-col md:flex-row justify-between items-center w-full pb-10">
-            <h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-2 md:mb-0">
+          <motion.div 
+            className="flex flex-col md:flex-row justify-between items-center w-full pb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.h1 
+              className="text-3xl md:text-4xl font-semibold leading-tight mb-2 md:mb-0"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
               Contact Us
-            </h1>
-            <p className="text-base md:text-lg text-gray-700 text-center md:w-[250px] md:text-right">
+            </motion.h1>
+            <motion.p 
+              className="text-base md:text-lg text-gray-700 text-center md:w-[250px] md:text-right"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               We&apos;d love to hear from you. Get in touch with any questions or
               feedback.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           <div className="w-full flex flex-col justify-between md:flex-row gap-12 md:gap-14 py-12 items-center">
             {/* Form Column */}
-            <div className="p-6 shadow-lg border-1 border-gray-200 rounded-none w-full max-w-none lg:max-w-[600px]">
-              <form className="space-y-6" onSubmit={handleSubmit}>
+            <motion.div 
+              className="p-6 shadow-lg border-1 border-gray-200 rounded-none w-full max-w-none lg:max-w-[600px]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <motion.form 
+                className="space-y-6" 
+                onSubmit={handleSubmit}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
                 <input type="text" name="botcheck" style={{ display: "none" }} />
 
                 {/* First + Last Name */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+                <motion.div 
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                  >
                     <label className="block text-sm font-bold text-black mb-2">
                       First Name <span className="text-[#FF5107]">*</span>
                     </label>
@@ -123,8 +162,12 @@ export default function ContactUs() {
                       className="w-full px-3 py-2 border border-black rounded-none bg-white"
                       required
                     />
-                  </div>
-                  <div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                  >
                     <label className="block text-sm font-bold text-black mb-2">
                       Last Name <span className="text-[#FF5107]">*</span>
                     </label>
@@ -136,12 +179,21 @@ export default function ContactUs() {
                       className="w-full px-3 py-2 border border-black rounded-none bg-white"
                       required
                     />
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
                 {/* Email + Phone */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+                <motion.div 
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.6 }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                  >
                     <label className="block text-sm font-bold text-black mb-2">
                       Email <span className="text-[#FF5107]">*</span>
                     </label>
@@ -154,7 +206,7 @@ export default function ContactUs() {
                       className="w-full px-3 py-2 border border-black rounded-none bg-white"
                       required
                     />
-                  </div>
+                  </motion.div>
                   <div>
                     <label className="block text-sm font-bold text-black mb-2">
                       Phone Number <span className="text-[#FF5107]">*</span>
@@ -168,7 +220,7 @@ export default function ContactUs() {
                       required
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Message */}
                 <div>
@@ -208,8 +260,8 @@ export default function ContactUs() {
                     />
                   )}
                 </button>
-              </form>
-            </div>
+              </motion.form>
+            </motion.div>
 
             {/* Info Column */}
             <div className="flex-[2] max-w-[450px] w-full space-y-16 p-6 items-center">

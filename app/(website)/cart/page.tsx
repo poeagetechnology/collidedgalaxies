@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Trash2, Plus, Minus } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 export default function CartPage() {
   const router = useRouter();
@@ -62,37 +63,91 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-white">
+      <motion.div 
+        className="min-h-screen bg-white"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-7xl mx-auto px-4 py-12">
-          <h1 className="text-4xl font-bold mb-8">SHOPPING BAG</h1>
-          <div className="text-center py-20">
+          <motion.h1 
+            className="text-4xl font-bold mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            SHOPPING BAG
+          </motion.h1>
+          <motion.div 
+            className="text-center py-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <p className="text-gray-600 text-lg mb-6">Your cart is empty</p>
-            <button
+            <motion.button
               onClick={() => router.push('/products')}
               className="inline-block bg-black text-white font-semibold py-3 px-8 hover:bg-gray-800"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               CONTINUE SHOPPING
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <motion.div 
+      className="min-h-screen bg-white"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <h1 className="text-4xl font-bold mb-8">SHOPPING BAG</h1>
+        <motion.h1 
+          className="text-4xl font-bold mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          SHOPPING BAG
+        </motion.h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section - Products */}
           <div className="lg:col-span-2">
-            <div className="space-y-6">
+            <motion.div 
+              className="space-y-6"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1,
+                  },
+                },
+              }}
+            >
               {cartItems.map((item: CartItem) => (
-                <div key={item.id || item.uniqueKey} className="flex gap-4 pb-6 border-b border-gray-200">
+                <motion.div 
+                  key={item.id || item.uniqueKey} 
+                  className="flex gap-4 pb-6 border-b border-gray-200"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
                   {/* Product Image */}
-                  <div className="flex-shrink-0 w-32 h-40 relative bg-gray-100">
+                  <motion.div 
+                    className="flex-shrink-0 w-32 h-40 relative bg-gray-100"
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     {item.image ? (
                       <Image
                         src={item.image}
@@ -105,7 +160,7 @@ export default function CartPage() {
                         No image
                       </div>
                     )}
-                  </div>
+                  </motion.div>
 
                   {/* Product Details */}
                   <div className="flex-1">
@@ -173,9 +228,9 @@ export default function CartPage() {
                       </div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Section - Order Summary */}
@@ -259,6 +314,6 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

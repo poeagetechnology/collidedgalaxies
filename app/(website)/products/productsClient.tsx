@@ -743,8 +743,23 @@ function ProductsPageContent() {
             </div>
           </div>
 
-          {/* ✅ Products Grid with slug-based links */}
-          <div className="my-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10">
+          {/* ✅ Products Grid with animations */}
+          <motion.div 
+            className="my-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10"
+            initial="hidden"
+            whileInView="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1,
+                  delayChildren: 0.2,
+                },
+              },
+            }}
+            viewport={{ once: false, margin: "-50px" }}
+          >
             {visibleProducts.map((product) => {
               const currentPrice = getCurrentPrice(product);
               const isOutOfStock = !hasAvailableSizes(product);
@@ -752,29 +767,54 @@ function ProductsPageContent() {
               const productUrl = getProductUrl(product); // ✅ Generate slug-based URL
 
               return (
-                <div key={product.id} className="flex flex-col">
+                <motion.div 
+                  key={product.id} 
+                  className="flex flex-col"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: false, margin: "-50px" }}
+                >
                   <Link href={productUrl} className="group">
-                    <div
+                    <motion.div
                       className={`aspect-[3/4] relative w-full overflow-hidden bg-gray-100 
     ${!loadedImages[product.id] ? 'pointer-events-none' : ''}`}
+                      whileHover={{ y: -5 }}
+                      transition={{ duration: 0.3 }}
                     >
                       {/* Out of Stock Tag - highest priority */}
                       {isOutOfStock && (
-                        <span className="absolute top-2 left-2 bg-red-600 text-white font-semibold px-3 py-1 text-xs shadow-sm z-10">
+                        <motion.span 
+                          className="absolute top-2 left-2 bg-red-600 text-white font-semibold px-3 py-1 text-xs shadow-sm z-10"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.4 }}
+                        >
                           OUT OF STOCK
-                        </span>
+                        </motion.span>
                       )}
 
                       {/* Combo Tag - only show if in stock */}
                       {!isOutOfStock && product.hasCombos && !!product.comboQuantity && !!product.comboDiscountPrice && (
-                        <span className="absolute top-2 left-2 bg-green-100 text-green-800 font-semibold px-3 py-1 text-xs shadow-sm z-10">
+                        <motion.span 
+                          className="absolute top-2 left-2 bg-green-100 text-green-800 font-semibold px-3 py-1 text-xs shadow-sm z-10"
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.4, delay: 0.1 }}
+                        >
                           BUY {product.comboQuantity} @{product.comboDiscountPrice}
-                        </span>
+                        </motion.span>
                       )}
 
                       {/* Rating Badge - show if product has ratings */}
                       {!isOutOfStock && productRatings[product.id] && (
-                        <div className="absolute bottom-2 left-2 bg-white text-black font-semibold px-3 py-1 text-xs shadow-sm z-10 flex items-center gap-1">
+                        <motion.div 
+                          className="absolute bottom-2 left-2 bg-white text-black font-semibold px-3 py-1 text-xs shadow-sm z-10 flex items-center gap-1"
+                          initial={{ opacity: 0, y: 10 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.2 }}
+                          viewport={{ once: false, margin: "-50px" }}
+                        >
                           <Image
                             src="/starIcon.svg"
                             alt="star"
@@ -784,7 +824,7 @@ function ProductsPageContent() {
                           />
                           <span>{productRatings[product.id].rating}</span>
                           <span className="text-green-700">({productRatings[product.id].count})</span>
-                        </div>
+                        </motion.div>
                       )}
 
                       <Image
@@ -798,9 +838,15 @@ function ProductsPageContent() {
                           setLoadedImages((prev) => ({ ...prev, [product.id]: true }))
                         }
                       />
-                    </div>
+                    </motion.div>
                   </Link>
-                  <div className="flex items-end justify-between mt-4">
+                  <motion.div 
+                    className="flex items-end justify-between mt-4"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                    viewport={{ once: false, margin: "-50px" }}
+                  >
                     <div className="flex flex-col">
                       <p className="uppercase text-xs mb-2">{product.category}</p>
                       <h3 className="text-xl text-gray-900">{product.title}</h3>
@@ -814,36 +860,52 @@ function ProductsPageContent() {
                       )}
                     </div>
                     <Link href={productUrl}>
-                      <button className={`p-4 cursor-pointer active:scale-95
+                      <motion.button 
+                        className={`p-4 cursor-pointer active:scale-95
                          ${isOutOfStock
                           ? 'bg-gray-400 cursor-not-allowed opacity-50'
                           : 'bg-black hover:bg-gray-900'
                         }
-                        `}>
+                        `}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
                         <Image src="/inclinedArrow.svg" alt="arrow icon" width={14} height={14} />
-                      </button>
+                      </motion.button>
                     </Link>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
           {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
+            <motion.div 
+              className="text-center py-12"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+            >
               <p className="text-lg text-gray-600">No products found matching your filters.</p>
-            </div>
+            </motion.div>
           )}
 
           {hasMoreProducts && (
-            <div className="flex justify-center mt-12">
-              <button
+            <motion.div 
+              className="flex justify-center mt-12"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+            >
+              <motion.button
                 onClick={handleViewMore}
                 className="bg-black text-white text-base px-8 py-3 cursor-pointer hover:bg-gray-900 transition-all duration-200 active:scale-95"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 View More
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           )}
         </div>
       </section>

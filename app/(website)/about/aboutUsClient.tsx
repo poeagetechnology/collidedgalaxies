@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import Navbar from '../../../src/components/header';
 import Footer from '../../../src/components/footer';
 import FeaturesBar from '../../../src/components/feature';
@@ -115,10 +116,21 @@ export default function AboutPage() {
     return (
         <>
             <Navbar />
-            <div className={`min-h-screen bg-white ${albertSans.className}`}>
+            <motion.div 
+              className={`min-h-screen bg-white ${albertSans.className}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
 
                 {/* HERO SECTION */}
-                <section className="relative min-h-[60vh] flex items-center justify-center">
+                <motion.section 
+                  className="relative min-h-[60vh] flex items-center justify-center"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: false, margin: "-50px" }}
+                >
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200">
                         <div className="absolute inset-0 opacity-30">
                             <Image
@@ -130,24 +142,54 @@ export default function AboutPage() {
                         </div>
                     </div>
 
-                    <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8">
-                        <h1 className="text-4xl md:text-5xl font-light mb-6 tracking-tight">
+                    <motion.div 
+                      className="relative z-10 text-center px-4 sm:px-6 lg:px-8"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6 }}
+                      viewport={{ once: false, margin: "-50px" }}
+                    >
+                        <motion.h1 
+                          className="text-4xl md:text-5xl font-light mb-6 tracking-tight"
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: 0.1 }}
+                          viewport={{ once: false, margin: "-50px" }}
+                        >
                             About Us
-                        </h1>
-                        <p className="text-md md:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
+                        </motion.h1>
+                        <motion.p 
+                          className="text-md md:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed"
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: 0.2 }}
+                          viewport={{ once: false, margin: "-50px" }}
+                        >
                             At Collided Galaxies (COGA), we craft timeless, high-quality garments
                             with thoughtful design and meticulous tailoring — delivering comfort,
                             confidence, and elegance to every wearer.
-                        </p>
-                    </div>
-                </section>
+                        </motion.p>
+                    </motion.div>
+                </motion.section>
 
                 {/* WHO WE ARE */}
-                <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <motion.section 
+                  className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: false, margin: "-50px" }}
+                >
                     <div className="grid md:grid-cols-2 md:gap-16 items-start">
 
                         {/* IMAGE LEFT - Image 1 */}
-                        <div className="relative h-[400px] md:h-full mt-8 md:mt-0 overflow-hidden order-2 md:order-1">
+                        <motion.div 
+                          className="relative h-[400px] md:h-full mt-8 md:mt-0 overflow-hidden order-2 md:order-1"
+                          initial={{ opacity: 0, x: -40 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6 }}
+                          viewport={{ once: false, margin: "-50px" }}
+                        >
                             {aboutImages[0] && (
                                 <Image
                                     src={aboutImages[0]}
@@ -159,23 +201,47 @@ export default function AboutPage() {
                                     }}
                                 />
                             )}
-                        </div>
+                        </motion.div>
 
                         {/* TEXT RIGHT */}
-                        <div className="space-y-12 order-1 md:order-2">
-                            <h2 className="text-4xl md:text-5xl font-light tracking-tight">
+                        <motion.div 
+                          className="space-y-12 order-1 md:order-2"
+                          initial={{ opacity: 0, x: 40 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6 }}
+                          viewport={{ once: false, margin: "-50px" }}
+                        >
+                            <motion.h2 
+                              className="text-4xl md:text-5xl font-light tracking-tight"
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.5, delay: 0.1 }}
+                              viewport={{ once: false, margin: "-50px" }}
+                            >
                                 Who We Are
-                            </h2>
+                            </motion.h2>
 
-                            <p className="text-gray-700 text-lg leading-relaxed">
+                            <motion.p 
+                              className="text-gray-700 text-lg leading-relaxed"
+                              initial={{ opacity: 0 }}
+                              whileInView={{ opacity: 1 }}
+                              transition={{ duration: 0.6, delay: 0.2 }}
+                              viewport={{ once: false, margin: "-50px" }}
+                            >
                                 Collided Galaxies (COGA) is a modern clothing brand built on
                                 three foundations — quality, detail, and timeless design.
                                 We believe true luxury comes from precision, comfort, and the
                                 confidence that flows from wearing something made with intention.
-                            </p>
+                            </motion.p>
 
                             {/* Image 2 */}
-                            <div className="relative h-[150px] md:h-[300px] overflow-hidden">
+                            <motion.div 
+                              className="relative h-[150px] md:h-[300px] overflow-hidden"
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              whileInView={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.6, delay: 0.3 }}
+                              viewport={{ once: false, margin: "-50px" }}
+                            >
                                 {aboutImages[1] && (
                                     <Image
                                         src={aboutImages[1]}
@@ -187,10 +253,10 @@ export default function AboutPage() {
                                         }}
                                     />
                                 )}
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
                     </div>
-                </section>
+                </motion.section>
 
                 {/* BRAND STRIP */}
                 <div className="bg-black text-white py-4 overflow-hidden my-8">
@@ -297,7 +363,7 @@ export default function AboutPage() {
                     </div>
                 </section>
                 <FeaturesBar />
-            </div>
+            </motion.div>
 
             <Footer />
         </>

@@ -3,6 +3,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Albert_Sans } from "next/font/google";
+import { motion } from "framer-motion";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
 import { useAuth, db } from "../../../src/context/authProvider";
@@ -110,51 +111,89 @@ export default function OrdersPage() {
 	return (
 		<>
 			<Navbar />
-			<main className={`min-h-screen bg-white ${albertSans.className}`}>
+			<motion.main 
+				className={`min-h-screen bg-white ${albertSans.className}`}
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.5 }}
+			>
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-14">
 					{/* Header */}
-					<div className="flex flex-col md:flex-row justify-between items-center w-full pb-14">
-						<h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-2 md:mb-0">
+					<motion.div 
+						className="flex flex-col md:flex-row justify-between items-center w-full pb-14"
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+					>
+						<motion.h1 
+							className="text-3xl md:text-4xl font-semibold leading-tight mb-2 md:mb-0"
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.5, delay: 0.1 }}
+						>
 							My Orders
-						</h1>
-						<p className="text-base md:text-lg text-gray-700 text-center md:w-[300px] md:text-right">
+						</motion.h1>
+						<motion.p 
+							className="text-base md:text-lg text-gray-700 text-center md:w-[300px] md:text-right"
+							initial={{ opacity: 0, x: 20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.5, delay: 0.2 }}
+						>
 							Stay informed about your purchases with detailed order timelines and status updates.
-						</p>
-					</div>
+						</motion.p>
+					</motion.div>
 
-					<div className="mb-4 p-3 bg-orange-50 border border-orange-200 text-sm text-orange-800">
+					<motion.div 
+						className="mb-4 p-3 bg-orange-50 border border-orange-200 text-sm text-orange-800"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.5, delay: 0.3 }}
+					>
 						<strong>Need to cancel your order?</strong> {" "}
 						Please reach out to us via Instagram DM, phone, or the Contact Us page.
 						Cancellations cannot be made directly through the website.
-					</div>
+					</motion.div>
 
 
 					{loading && <p>Checking authentication...</p>}
 					{!loading && !user && <p>Please log in to view your orders.</p>}
 
 					{user && (
-						<section>
+						<motion.section
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{ duration: 0.5, delay: 0.4 }}
+						>
 							{/* Tabs */}
-							<div className="flex border-b mb-6">
-								<button
+							<motion.div 
+								className="flex border-b mb-6"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.5 }}
+							>
+								<motion.button
 									onClick={() => setActiveTab("current")}
 									className={`px-6 py-3 font-medium cursor-pointer ${activeTab === "current"
 										? "border-b-2 border-black text-black"
 										: "text-gray-500 hover:text-gray-700"
 										}`}
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
 									Current Orders ({currentOrders.length})
-								</button>
-								<button
+								</motion.button>
+								<motion.button
 									onClick={() => setActiveTab("previous")}
 									className={`px-6 py-3 font-medium cursor-pointer ${activeTab === "previous"
 										? "border-b-2 border-black text-black"
 										: "text-gray-500 hover:text-gray-700"
 										}`}
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
 									Previous Orders ({previousOrders.length})
-								</button>
-							</div>
+								</motion.button>
+							</motion.div>
 
 							{fetching && <p>Loading orders...</p>}
 							{error && <p className="text-red-600">{error}</p>}

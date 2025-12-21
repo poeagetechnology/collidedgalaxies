@@ -91,7 +91,8 @@ export default function Footer() {
                 />
               </Link>
             </motion.div>
-            {/* <Link href="#" aria-label="X" className="hover:opacity-80 transition">
+            {/* Commented out X and LinkedIn icons
+            <Link href="#" aria-label="X" className="hover:opacity-80 transition">
               <Image
                 src="/xIcon.svg"
                 alt="X"
@@ -108,10 +109,11 @@ export default function Footer() {
                 height={24}
                 className="w-8 h-8"
               />
-            </Link> */}
-          </div>
+            </Link>
+            */}
+          </motion.div>
 
-        </div>
+        </motion.div>
 
         {/* ✅ Right: 3 Columns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:w-2/3 text-left">
@@ -148,7 +150,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Divider */}
       <hr className="border-gray-800 my-10" />
