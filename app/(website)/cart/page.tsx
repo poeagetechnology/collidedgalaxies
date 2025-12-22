@@ -73,17 +73,17 @@ export default function CartPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-12">
             <motion.button
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-gray-700 hover:text-black mb-8 transition"
+              className="flex items-center gap-2 text-gray-700 hover:text-black mb-4 sm:mb-8 transition text-sm sm:text-base"
               whileHover={{ x: -5 }}
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
               <span>Back</span>
             </motion.button>
             <motion.h1 
-              className="text-4xl font-bold mb-8"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -91,15 +91,15 @@ export default function CartPage() {
               SHOPPING BAG
             </motion.h1>
             <motion.div 
-              className="text-center py-20"
+              className="text-center py-12 sm:py-20"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <p className="text-gray-600 text-lg mb-6">Your cart is empty</p>
+              <p className="text-gray-600 text-base sm:text-lg mb-4 sm:mb-6">Your cart is empty</p>
               <motion.button
                 onClick={() => router.push('/products')}
-                className="inline-block bg-black text-white font-semibold py-3 px-8 hover:bg-gray-800"
+                className="inline-block bg-black text-white font-semibold py-2 sm:py-3 px-6 sm:px-8 hover:bg-gray-800 text-sm sm:text-base"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -122,20 +122,20 @@ export default function CartPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
           {/* Back Button */}
           <motion.button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-700 hover:text-black mb-8 transition"
+            className="flex items-center gap-2 text-gray-700 hover:text-black mb-4 sm:mb-8 transition text-sm sm:text-base"
             whileHover={{ x: -5 }}
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
             <span>Back</span>
           </motion.button>
 
           {/* Header */}
           <motion.h1 
-            className="text-4xl font-bold mb-8"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -143,11 +143,11 @@ export default function CartPage() {
             SHOPPING BAG
           </motion.h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Left Section - Products */}
           <div className="lg:col-span-2">
             <motion.div 
-              className="space-y-6"
+              className="space-y-4 sm:space-y-6"
               initial="hidden"
               animate="visible"
               variants={{
@@ -163,14 +163,14 @@ export default function CartPage() {
               {cartItems.map((item: CartItem) => (
                 <motion.div 
                   key={item.id || item.uniqueKey} 
-                  className="flex gap-4 pb-6 border-b border-gray-200"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-gray-200"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4 }}
                 >
                   {/* Product Image */}
                   <motion.div 
-                    className="flex-shrink-0 w-32 h-40 relative bg-gray-100"
+                    className="flex-shrink-0 w-full sm:w-24 md:w-32 h-40 sm:h-32 relative bg-gray-100"
                     whileHover={{ y: -5 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -190,14 +190,14 @@ export default function CartPage() {
 
                   {/* Product Details */}
                   <div className="flex-1">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-semibold text-lg">{item.title}</h3>
-                        <p className="text-gray-600 text-sm">Product ID: {item.productId}</p>
+                    <div className="flex justify-between items-start mb-2 sm:mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-base sm:text-lg line-clamp-1">{item.title}</h3>
+                        <p className="text-gray-600 text-xs sm:text-sm">Product ID: {item.productId}</p>
                       </div>
                       <button
                         onClick={() => removeFromCart(item.id as number)}
-                        className="text-gray-400 hover:text-red-500 transition"
+                        className="text-gray-400 hover:text-red-500 transition flex-shrink-0 ml-2"
                       >
                         <Trash2 size={20} />
                       </button>

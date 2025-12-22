@@ -88,8 +88,8 @@ function NavbarContent() {
   return (
     <>
       <nav className={`fixed top-0 left-0 w-full z-100 bg-white ${albertSans.className}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-between h-16">
+        <div className="w-full mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+          <div className="relative flex items-center justify-between h-14 sm:h-16">
 
             {/* Left Navigation */}
             {showNavLinks && (
@@ -113,10 +113,10 @@ function NavbarContent() {
             )}
 
             {/* Center Logo */}
-            <Link href="/" className={`text-2xl tracking-wide text-gray-900 md:absolute md:left-1/2 md:-translate-x-1/2 ${inriaSerif.className}`}>COGA</Link>
+            <Link href="/" className={`text-lg sm:text-2xl tracking-wide text-gray-900 md:absolute md:left-1/2 md:-translate-x-1/2 ${inriaSerif.className}`}>COGA</Link>
 
             {/* Right side */}
-            <div className="flex items-center gap-6 ml-auto">
+            <div className="flex items-center gap-3 sm:gap-4 md:gap-6 ml-auto">
               {!loading && isAdmin && !isCheckoutPage && (
                 <Link href="/admin"><button className="hidden md:flex text-sm cursor-pointer items-center justify-center px-2 py-2 bg-purple-600 text-white hover:bg-purple-700 transition-colors" title="Admin">Admin</button></Link>
               )}
@@ -171,8 +171,8 @@ function NavbarContent() {
 
       {/* Mobile Drawer - keeping same structure, just cleaner */}
       {showNavLinks && (
-        <aside className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-100 md:hidden ${albertSans.className} ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-          <div className="p-5 flex flex-col space-y-6 text-gray-800 font-medium h-full">
+        <aside className={`fixed top-0 right-0 h-full w-full max-w-xs sm:max-w-sm bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-100 md:hidden ${albertSans.className} ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="p-3 sm:p-5 flex flex-col space-y-4 sm:space-y-6 text-gray-800 font-medium h-full">
             <div className="flex justify-end mb-6"><button onClick={() => { setIsOpen(false); setMobileProductsOpen(false); }}><X size={26} /></button></div>
 
             {user && (

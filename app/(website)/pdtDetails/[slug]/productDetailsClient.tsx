@@ -149,7 +149,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
   return (
     <>
       <Navbar />
-      <div className={`bg-white min-h-screen pt-20 ${albertSans.className}`}>
+      <div className={`bg-white min-h-screen ${albertSans.className}`}>
         {/* Desktop Header Navigation */}
         <div className="hidden md:flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <Link href="/products" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors">

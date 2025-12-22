@@ -125,24 +125,24 @@ export default function CartDrawer() {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-[100%] max-w-[420px] z-100 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${albertSans.className} ${isCartOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-full sm:max-w-sm md:max-w-[420px] z-100 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${albertSans.className} ${isCartOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         {/* Close button */}
         <button
-          className="absolute right-6 top-6 text-4xl cursor-pointer text-gray-600 hover:text-black"
+          className="absolute right-3 sm:right-6 top-4 sm:top-6 text-2xl sm:text-4xl cursor-pointer text-gray-600 hover:text-black"
           onClick={() => setIsCartOpen(false)}
         >
           ×
         </button>
 
         {/* Header */}
-        <div className="pb-4 pt-24 px-6 font-semibold text-2xl">
+        <div className="pb-4 pt-16 sm:pt-24 px-3 sm:px-6 font-semibold text-lg sm:text-2xl">
           Your Cart <span className="text-sm font-normal">({cartItems.length})</span>
         </div>
 
         {/* Main Section */}
-        <div className="flex flex-col justify-between h-[calc(100%-9rem)] overflow-y-scroll px-6 scrollbar-hide">
+        <div className="flex flex-col justify-between h-[calc(100%-8rem)] sm:h-[calc(100%-9rem)] overflow-y-scroll px-3 sm:px-6 scrollbar-hide">
           {cartItems.length === 0 ? (
             <div className="flex flex-col flex-1 justify-center items-center text-gray-500 text-sm">
               <p className="text-black text-xl">Your Cart is Empty</p>
@@ -311,22 +311,22 @@ export default function CartDrawer() {
           )}
 
           {/* Bottom section */}
-          <div className="sticky bottom-0 bg-white py-4 mt-4">
-            <div className="flex justify-between text-base pt-2 pb-6">
+          <div className="sticky bottom-0 bg-white py-3 sm:py-4 mt-4">
+            <div className="flex justify-between text-sm sm:text-base pt-2 pb-4 sm:pb-6">
               <span>Subtotal ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})</span>
-              <span className='text-xl font-semibold'>₹{subtotal.toFixed(2)}</span>
+              <span className='text-base sm:text-xl font-semibold'>₹{subtotal.toFixed(2)}</span>
             </div>
 
             {cartItems.length > 0 ? (
               <>
                 <button
-                  className="w-full py-2 cursor-pointer bg-black text-white font-semibold text-base hover:bg-gray-800 mb-2"
+                  className="w-full py-2 cursor-pointer bg-black text-white font-semibold text-sm sm:text-base hover:bg-gray-800 mb-2"
                   onClick={() => { setIsCartOpen(false); router.push('/cart'); }}
                 >
                   Go to Cart
                 </button>
                 <button
-                  className="w-full py-2 cursor-pointer bg-blue-600 text-white font-semibold text-base hover:bg-blue-700 mb-2"
+                  className="w-full py-2 cursor-pointer bg-blue-600 text-white font-semibold text-sm sm:text-base hover:bg-blue-700 mb-2"
                   onClick={() => {
                     // Block checkout if any combo group underfilled
                     const underfilled = comboStatus.filter(cs => cs.isUnder);
@@ -348,7 +348,7 @@ export default function CartDrawer() {
             ) : null}
 
             <button
-              className="w-full py-2 border cursor-pointer border-black font-semibold text-base hover:bg-gray-100"
+              className="w-full py-2 border cursor-pointer border-black font-semibold text-sm sm:text-base hover:bg-gray-100"
               onClick={() => { setIsCartOpen(false); router.push("/products") }}
             >
               Continue Shopping

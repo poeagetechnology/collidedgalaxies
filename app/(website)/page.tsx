@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import Navbar from "../../src/components/header";
 import HeroSection from "../../src/components/hero";
 import NewThisWeek from "../../src/components/newthisweek";
-import NewArrivals from "../../src/components/newarrival";
 import ApproachSection from "../../src/components/approachSection";
 import QuoteSection from "../../src/components/saying";
 import CollectionsSection from "../../src/components/collections";
@@ -27,7 +26,6 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <NewThisWeek />
-      <NewArrivals />
       <ApproachSection />
       <QuoteSection />
       <CollectionsSection />

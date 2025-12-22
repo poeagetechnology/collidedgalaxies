@@ -70,7 +70,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} pt-14 sm:pt-16`}>
         <AuthProvider>
           <CartProvider>
             {children}
