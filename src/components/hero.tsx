@@ -195,29 +195,29 @@ export default function HeroSection() {
         opacity: 1,
         x: 0,
         zIndex: 30,
-        className: "h-[320px] sm:h-[380px] md:h-[440px] lg:h-[480px] w-[220px] sm:w-[260px] md:w-[300px] lg:w-[340px]",
+        className: "h-[320px] sm:h-[340px] md:h-[320px] lg:h-[340px] w-[220px] sm:w-[240px] md:w-[220px] lg:w-[240px]",
         showInfo: true
       };
     } else if (diff === -1 || diff === products.length - 1) {
       // Left product
-      const xOffset = window.innerWidth < 640 ? -120 : window.innerWidth < 768 ? -160 : window.innerWidth < 1024 ? -200 : -240;
+      const xOffset = window.innerWidth < 640 ? -120 : window.innerWidth < 768 ? -140 : window.innerWidth < 1024 ? -150 : -160;
       return {
         scale: 0.7,
         opacity: 0.7,
         x: xOffset,
         zIndex: 20,
-        className: "h-[240px] sm:h-[280px] md:h-[320px] lg:h-[360px] w-[160px] sm:w-[180px] md:w-[200px] lg:w-[220px]",
+        className: "h-[240px] sm:h-[260px] md:h-[240px] lg:h-[260px] w-[160px] sm:w-[180px] md:w-[160px] lg:w-[180px]",
         showInfo: false
       };
     } else if (diff === 1 || diff === -(products.length - 1)) {
       // Right product
-      const xOffset = window.innerWidth < 640 ? 120 : window.innerWidth < 768 ? 160 : window.innerWidth < 1024 ? 200 : 240;
+      const xOffset = window.innerWidth < 640 ? 120 : window.innerWidth < 768 ? 140 : window.innerWidth < 1024 ? 150 : 160;
       return {
         scale: 0.7,
         opacity: 0.7,
         x: xOffset,
         zIndex: 20,
-        className: "h-[240px] sm:h-[280px] md:h-[320px] lg:h-[360px] w-[160px] sm:w-[180px] md:w-[200px] lg:w-[220px]",
+        className: "h-[240px] sm:h-[260px] md:h-[240px] lg:h-[260px] w-[160px] sm:w-[180px] md:w-[160px] lg:w-[180px]",
         showInfo: false
       };
     } else {
@@ -249,26 +249,87 @@ export default function HeroSection() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center gap-6 sm:gap-8 md:gap-10">
-            {/* Header - Responsive */}
-            <motion.div 
-              className="text-center space-y-2 sm:space-y-3 md:space-y-4 w-full px-2"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
-                Featured Collection
-              </h1>
-              <p className="text-gray-600 text-xs sm:text-sm md:text-base lg:text-lg max-w-md sm:max-w-lg md:max-w-xl mx-auto">
-                Discover our premium selection of curated products
-              </p>
-            </motion.div>
+          <div className="flex flex-col md:flex-row items-center justify-start gap-6 sm:gap-8 md:gap-12 lg:gap-16">
+            {/* Left Content Section - Header and CTA for Desktop */}
+            <div className="w-full md:w-1/3 flex flex-col items-center md:items-start gap-6 sm:gap-8 md:gap-10 order-2 md:order-1">
+              {/* Header - Responsive - Hidden on Mobile */}
+              <motion.div 
+                className="hidden md:block text-center md:text-left space-y-2 sm:space-y-3 md:space-y-4 w-full px-2"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+                  Featured Collection
+                </h1>
+                <p className="text-gray-600 text-xs sm:text-sm md:text-sm lg:text-base max-w-md sm:max-w-lg md:max-w-none mx-auto md:mx-0">
+                  Discover our premium selection of curated products
+                </p>
+              </motion.div>
+
+              {/* CTA Section - Responsive */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="text-center md:text-left space-y-4 sm:space-y-5 md:space-y-6 w-full"
+              >
+                <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
+                  <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+                    Ready to Explore More?
+                  </h2>
+                  <p className="text-gray-600 text-xs sm:text-sm md:text-sm lg:text-base">
+                    Browse our complete collection
+                  </p>
+                </div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center gap-2 sm:gap-3 bg-gray-900 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-medium hover:bg-gray-800 transition-all group shadow-lg hover:shadow-xl"
+                  >
+                    Shop All Products
+                    <motion.span
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="inline-block"
+                    >
+                      <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                    </motion.span>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </div>
+
+            {/* Right Carousel Section */}
+            <div className="w-full md:w-2/3 flex justify-center md:justify-end order-1 md:order-2 relative">
+              {/* Mobile Header - Positioned above carousel */}
+              {isMobile && (
+                <motion.div 
+                  className="absolute top-0 left-0 right-0 text-center space-y-1 z-50 px-2 mb-4"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
+                    Featured Collection
+                  </h1>
+                  <p className="text-gray-600 text-xs sm:text-sm max-w-sm mx-auto">
+                    Discover our premium selection
+                  </p>
+                </motion.div>
+              )}
 
             {/* 3D Carousel Container - Responsive Height */}
-            <div className="relative w-full flex items-center justify-center overflow-visible" style={{ 
-              height: isMobile ? '280px' : '380px',
-              maxHeight: '50vh'
+            <div className="relative w-full md:w-auto flex items-center justify-center overflow-visible" style={{ 
+              height: isMobile ? '320px' : '380px',
+              maxHeight: '50vh',
+              width: isMobile ? '100%' : 'auto',
+              minWidth: isMobile ? 'auto' : '400px',
+              marginTop: isMobile ? '60px' : '0px'
             }}>
               {/* Background Container */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-50/20 to-purple-50/20 rounded-2xl sm:rounded-3xl" />
@@ -407,57 +468,6 @@ export default function HeroSection() {
                 </div>
               </div>
             </div>
-
-            {/* CTA Section - Responsive */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-center space-y-4 sm:space-y-5 md:space-y-6 mt-4 sm:mt-6"
-            >
-              <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
-                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
-                  Ready to Explore More?
-                </h2>
-                <p className="text-gray-600 text-xs sm:text-sm md:text-base lg:text-lg">
-                  Browse our complete collection
-                </p>
-              </div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Link
-                  href="/products"
-                  className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-medium hover:bg-gray-800 transition-all group shadow-lg hover:shadow-xl"
-                >
-                  {isMobile ? 'Shop Now' : 'Shop All Products'}
-                  {!isMobile && (
-                    <motion.span
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="inline-block"
-                    >
-                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </motion.span>
-                  )}
-                </Link>
-              </motion.div>
-            </motion.div>
-
-            {/* Auto-Slide Indicator */}
-            <div className="mt-2 sm:mt-4">
-              <div className="w-32 sm:w-40 h-1 bg-gray-200 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gray-900"
-                  key={currentIndex}
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 5, ease: "linear" }}
-                />
-              </div>
-              <p className="text-gray-500 text-xs sm:text-sm mt-1">Auto-rotates every 5 seconds</p>
             </div>
           </div>
         )}
