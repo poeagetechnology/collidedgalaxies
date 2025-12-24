@@ -71,7 +71,7 @@ export default function HeroSection() {
         
         snapshot.forEach((doc) => {
           const data = doc.data();
-          if (loadedProducts.length < 3) {
+          if (loadedProducts.length < 7) {
             loadedProducts.push({
               id: doc.id,
               name: data.title || data.name || 'Featured Product',
@@ -82,7 +82,7 @@ export default function HeroSection() {
           }
         });
 
-        if (loadedProducts.length >= 3) {
+        if (loadedProducts.length >= 1) {
           setProducts(loadedProducts);
         }
       } catch (error) {
@@ -138,14 +138,13 @@ export default function HeroSection() {
     let diff = productIndex - currentIndex;
     
     // Handle wrap-around for left side
-    if (diff < -1) diff += products.length;
+    if (diff < -3) diff += products.length;
     // Handle wrap-around for right side
-    if (diff > 1) diff -= products.length;
+    if (diff > 3) diff -= products.length;
 
-    // Mobile positions
+    // Mobile positions - show 1 center + 2 on sides
     if (isMobile) {
       if (diff === 0) {
-        // Center product (mobile)
         return {
           scale: 1,
           opacity: 1,
@@ -155,82 +154,121 @@ export default function HeroSection() {
           showInfo: true
         };
       } else if (diff === -1 || diff === products.length - 1) {
-        // Left product (mobile)
         return {
           scale: 0.6,
           opacity: 0.6,
-          x: -100,
+          x: -110,
           zIndex: 20,
           className: "h-[180px] w-[120px]",
           showInfo: false
         };
       } else if (diff === 1 || diff === -(products.length - 1)) {
-        // Right product (mobile)
         return {
           scale: 0.6,
           opacity: 0.6,
-          x: 100,
+          x: 110,
           zIndex: 20,
           className: "h-[180px] w-[120px]",
           showInfo: false
         };
-      } else {
-        // Hidden products
+      } else if (diff === -2 || diff === products.length - 2) {
         return {
-          scale: 0.3,
+          scale: 0.4,
+          opacity: 0.4,
+          x: -220,
+          zIndex: 15,
+          className: "h-[140px] w-[100px]",
+          showInfo: false
+        };
+      } else if (diff === 2 || diff === -(products.length - 2)) {
+        return {
+          scale: 0.4,
+          opacity: 0.4,
+          x: 220,
+          zIndex: 15,
+          className: "h-[140px] w-[100px]",
+          showInfo: false
+        };
+      } else {
+        return {
+          scale: 0.2,
           opacity: 0,
-          x: diff < 0 ? -150 : 150,
+          x: diff < 0 ? -330 : 330,
           zIndex: 10,
-          className: "h-[180px] w-[120px]",
+          className: "h-[140px] w-[100px]",
           showInfo: false
         };
       }
     }
 
-    // Desktop/Tablet positions
-    if (diff === 0) {
-      // Center product
-      return {
+    // Desktop/Tablet positions - show all 7 in a horizontal scroll
+    const positions: { [key: string]: any } = {
+      "0": {
         scale: 1.2,
         opacity: 1,
         x: 0,
         zIndex: 30,
         className: "h-[320px] sm:h-[340px] md:h-[320px] lg:h-[340px] w-[220px] sm:w-[240px] md:w-[220px] lg:w-[240px]",
         showInfo: true
-      };
-    } else if (diff === -1 || diff === products.length - 1) {
-      // Left product
-      const xOffset = window.innerWidth < 640 ? -120 : window.innerWidth < 768 ? -140 : window.innerWidth < 1024 ? -150 : -160;
-      return {
-        scale: 0.7,
+      },
+      "-1": {
+        scale: 0.95,
+        opacity: 0.85,
+        x: -130,
+        zIndex: 29,
+        className: "h-[300px] sm:h-[320px] md:h-[300px] lg:h-[320px] w-[200px] sm:w-[220px] md:w-[200px] lg:w-[220px]",
+        showInfo: false
+      },
+      "1": {
+        scale: 0.95,
+        opacity: 0.85,
+        x: 130,
+        zIndex: 29,
+        className: "h-[300px] sm:h-[320px] md:h-[300px] lg:h-[320px] w-[200px] sm:w-[220px] md:w-[200px] lg:w-[220px]",
+        showInfo: false
+      },
+      "-2": {
+        scale: 0.8,
         opacity: 0.7,
-        x: xOffset,
-        zIndex: 20,
-        className: "h-[240px] sm:h-[260px] md:h-[240px] lg:h-[260px] w-[160px] sm:w-[180px] md:w-[160px] lg:w-[180px]",
+        x: -250,
+        zIndex: 28,
+        className: "h-[280px] sm:h-[300px] md:h-[280px] lg:h-[300px] w-[180px] sm:w-[200px] md:w-[180px] lg:w-[200px]",
         showInfo: false
-      };
-    } else if (diff === 1 || diff === -(products.length - 1)) {
-      // Right product
-      const xOffset = window.innerWidth < 640 ? 120 : window.innerWidth < 768 ? 140 : window.innerWidth < 1024 ? 150 : 160;
-      return {
-        scale: 0.7,
+      },
+      "2": {
+        scale: 0.8,
         opacity: 0.7,
-        x: xOffset,
-        zIndex: 20,
-        className: "h-[240px] sm:h-[260px] md:h-[240px] lg:h-[260px] w-[160px] sm:w-[180px] md:w-[160px] lg:w-[180px]",
+        x: 250,
+        zIndex: 28,
+        className: "h-[280px] sm:h-[300px] md:h-[280px] lg:h-[300px] w-[180px] sm:w-[200px] md:w-[180px] lg:w-[200px]",
         showInfo: false
-      };
-    } else {
-      // Hidden products
-      return {
-        scale: 0.4,
-        opacity: 0,
-        x: diff < 0 ? -300 : 300,
-        zIndex: 10,
-        className: "h-[240px] w-[160px]",
+      },
+      "-3": {
+        scale: 0.65,
+        opacity: 0.55,
+        x: -360,
+        zIndex: 27,
+        className: "h-[260px] sm:h-[280px] md:h-[260px] lg:h-[280px] w-[160px] sm:w-[180px] md:w-[160px] lg:w-[180px]",
         showInfo: false
-      };
-    }
+      },
+      "3": {
+        scale: 0.65,
+        opacity: 0.55,
+        x: 360,
+        zIndex: 27,
+        className: "h-[260px] sm:h-[280px] md:h-[260px] lg:h-[280px] w-[160px] sm:w-[180px] md:w-[160px] lg:w-[180px]",
+        showInfo: false
+      }
+    };
+
+    return positions[diff.toString()] || {
+      scale: 0.4,
+      opacity: 0,
+      x: diff < 0 ? -500 : 500,
+      zIndex: 10,
+      className: "h-[260px] w-[160px]",
+      showInfo: false
+    };
   };
 
   // Calculate product index with wrap-around
@@ -249,63 +287,9 @@ export default function HeroSection() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row items-center justify-start gap-6 sm:gap-8 md:gap-12 lg:gap-16">
-            {/* Left Content Section - Header and CTA for Desktop */}
-            <div className="w-full md:w-1/3 flex flex-col items-center md:items-start gap-6 sm:gap-8 md:gap-10 order-2 md:order-1">
-              {/* Header - Responsive - Hidden on Mobile */}
-              <motion.div 
-                className="hidden md:block text-center md:text-left space-y-2 sm:space-y-3 md:space-y-4 w-full px-2"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                  Featured Collection
-                </h1>
-                <p className="text-gray-600 text-xs sm:text-sm md:text-sm lg:text-base max-w-md sm:max-w-lg md:max-w-none mx-auto md:mx-0">
-                  Discover our premium selection of curated products
-                </p>
-              </motion.div>
-
-              {/* CTA Section - Responsive */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="text-center md:text-left space-y-4 sm:space-y-5 md:space-y-6 w-full"
-              >
-                <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
-                  <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
-                    Ready to Explore More?
-                  </h2>
-                  <p className="text-gray-600 text-xs sm:text-sm md:text-sm lg:text-base">
-                    Browse our complete collection
-                  </p>
-                </div>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center gap-2 sm:gap-3 bg-gray-900 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-medium hover:bg-gray-800 transition-all group shadow-lg hover:shadow-xl"
-                  >
-                    Shop All Products
-                    <motion.span
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="inline-block"
-                    >
-                      <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                    </motion.span>
-                  </Link>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            {/* Right Carousel Section */}
-            <div className="w-full md:w-2/3 flex justify-center md:justify-end order-1 md:order-2 relative">
+          <div className="flex flex-col md:flex-row items-center justify-center w-full">
+            {/* Carousel Section */}
+            <div className="w-full flex justify-center relative">
               {/* Mobile Header - Positioned above carousel */}
               {isMobile && (
                 <motion.div 
@@ -323,12 +307,12 @@ export default function HeroSection() {
                 </motion.div>
               )}
 
-            {/* 3D Carousel Container - Responsive Height */}
-            <div className="relative w-full md:w-auto flex items-center justify-center overflow-visible" style={{ 
-              height: isMobile ? '320px' : '380px',
+              {/* 3D Carousel Container - Responsive Height */}
+              <div className="relative w-full md:w-auto flex items-center justify-center overflow-visible" style={{ 
+              height: isMobile ? '320px' : '420px',
               maxHeight: '50vh',
               width: isMobile ? '100%' : 'auto',
-              minWidth: isMobile ? 'auto' : '400px',
+              minWidth: isMobile ? 'auto' : '900px',
               marginTop: isMobile ? '60px' : '0px'
             }}>
               {/* Background Container */}
@@ -408,33 +392,32 @@ export default function HeroSection() {
                       {position.showInfo && (
                         <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-6 lg:p-8 z-20">
                           <motion.h3 
-                            className="text-white text-sm sm:text-base md:text-xl lg:text-2xl font-bold mb-1 sm:mb-2 line-clamp-1"
+                            className="text-white text-sm sm:text-base md:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 line-clamp-1"
                             initial={{ y: 10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.3, delay: 0.1 }}
                           >
                             {product.name}
                           </motion.h3>
-                          <motion.p 
-                            className="text-gray-200 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1"
-                            initial={{ y: 10, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.3, delay: 0.2 }}
-                          >
-                            {product.description}
-                          </motion.p>
                           <motion.div 
-                            className="flex items-center justify-between"
+                            className="flex items-center justify-center"
                             initial={{ y: 10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.3, delay: 0.3 }}
                           >
-                            <span className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-white">
-                              ₹{product.price.toLocaleString()}
-                            </span>
-                            <button className="px-3 py-1 sm:px-4 sm:py-1.5 md:px-5 md:py-2 bg-white text-gray-900 rounded-full text-xs sm:text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap">
-                              {isMobile ? 'View' : 'View Details'}
-                            </button>
+                            <motion.div
+                              whileHover={{ scale: 1.08, boxShadow: "0 20px 40px rgba(0,0,0,0.3)" }}
+                              whileTap={{ scale: 0.95 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Link
+                                href={`/pdtDetails/${product.id}`}
+                                className="inline-flex items-center gap-2 px-8 py-3 sm:px-9 sm:py-3.5 md:px-10 md:py-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-full text-sm sm:text-base font-bold hover:from-gray-800 hover:to-gray-700 transition-all duration-300 whitespace-nowrap shadow-lg"
+                              >
+                                <span>Buy Now</span>
+                                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                              </Link>
+                            </motion.div>
                           </motion.div>
                         </div>
                       )}
@@ -445,9 +428,9 @@ export default function HeroSection() {
 
               {/* Dot Indicators - Responsive */}
               <div className="absolute -bottom-8 sm:-bottom-10 left-1/2 transform -translate-x-1/2 z-40">
-                <div className="flex items-center gap-1.5 sm:gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-lg">
+                <div className="flex items-center gap-2 sm:gap-3 bg-white/90 backdrop-blur-md px-4 py-2.5 sm:px-5 sm:py-3 rounded-full shadow-xl">
                   {products.map((_, index) => (
-                    <button
+                    <motion.button
                       key={index}
                       onClick={() => {
                         if (!isTransitioning && index !== currentIndex) {
@@ -456,18 +439,20 @@ export default function HeroSection() {
                           setTimeout(() => setIsTransitioning(false), 500);
                         }
                       }}
-                      className={`transition-all duration-300 ${
+                      className={`transition-all duration-300 rounded-full ${
                         index === currentIndex
-                          ? "w-4 h-1.5 sm:w-6 sm:h-2 bg-gray-900 rounded-full"
-                          : "w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 rounded-full hover:bg-gray-400"
+                          ? "w-6 h-2.5 sm:w-8 sm:h-3 bg-gradient-to-r from-gray-900 to-gray-700 shadow-md"
+                          : "w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-300 hover:bg-gray-500"
                       }`}
                       disabled={isTransitioning}
                       aria-label={`Go to slide ${index + 1}`}
+                      whileHover={index !== currentIndex ? { scale: 1.2 } : undefined}
+                      whileTap={index !== currentIndex ? { scale: 0.9 } : undefined}
                     />
                   ))}
                 </div>
+                </div>
               </div>
-            </div>
             </div>
           </div>
         )}

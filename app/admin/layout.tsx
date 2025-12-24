@@ -17,7 +17,7 @@ export default function AdminLayout({
         </div>
         
         {/* Main Content Area */}
-        <div className="flex-1 w-full lg:ml-58">
+        <div className="flex-1 w-full lg:ml-64">
           {children}
         </div>
       </div>

@@ -30,6 +30,7 @@ export const ADMIN_MENU_ITEMS = [
   { name: "Products", href: "/admin/products" },
   { name: "Orders", href: "/admin/orders" },
   { name: "Customers", href: "/admin/customers" },
+  { name: "Testimonials", href: "/admin/testimonials" },
   // { name: "Reviews", href: "/admin/reviews" },
   { name: "Admins", href: "/admin/admins" },
   { name: "Media Manager", href: "/admin/media-manager" },
