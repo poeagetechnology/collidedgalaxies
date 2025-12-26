@@ -2,20 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Albert_Sans, Inria_Serif } from "next/font/google";
 import { ADMIN_MENU_ITEMS } from "@/src/server/utils/constants";
-
-const albertSans = Albert_Sans({ subsets: ["latin"], weight: ["400", "500", "700"] });
-const inriaSerif = Inria_Serif({ subsets: ['latin'], weight: ['400', '700'] });
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className={`flex flex-col w-full sm:w-56 md:w-64 bg-white text-black shadow-lg lg:fixed lg:top-0 lg:left-0 lg:bottom-0 h-screen lg:h-full ${albertSans.className}`}>
+    <div className="flex flex-col w-full sm:w-56 md:w-64 bg-white text-black shadow-lg lg:fixed lg:top-0 lg:left-0 lg:bottom-0 h-screen lg:h-full">
       {/* Logo */}
       <div className="flex items-center justify-center h-20 sm:h-24 md:h-28 flex-shrink-0">
-        <h1 className={`${inriaSerif.className} text-3xl sm:text-4xl md:text-5xl text-black`}>COGA</h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl text-black">COGA</h1>
       </div>
 
       {/* Menu Items */}

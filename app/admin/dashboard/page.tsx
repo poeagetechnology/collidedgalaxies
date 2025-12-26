@@ -4,12 +4,6 @@ import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import AdminSidebar from '@/src/components/admin/adminSidebar';
 import DashboardRealtime from '@/src/components/admin/DashboardRealtime';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-});
 
 export default function DashboardPage({ initial }: { initial?: any }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -18,7 +12,7 @@ export default function DashboardPage({ initial }: { initial?: any }) {
     <>
       {/* Mobile Sidebar Overlay */}
       <div
-        className={`fixed inset-0 bg-black z-40 lg:hidden transition-opacity duration-300 ${albertSans.className} ${
+        className={`fixed inset-0 bg-black z-40 lg:hidden transition-opacity duration-300 ${
           sidebarOpen ? 'opacity-50 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setSidebarOpen(false)}
@@ -26,7 +20,7 @@ export default function DashboardPage({ initial }: { initial?: any }) {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 w-58 h-screen bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${albertSans.className} ${
+        className={`fixed top-0 left-0 w-58 h-screen bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -40,7 +34,7 @@ export default function DashboardPage({ initial }: { initial?: any }) {
       </div>
 
       {/* Main Content */}
-      <div className={`${albertSans.className}`}>
+      <div>
         {/* Mobile Header */}
         <div className="lg:hidden bg-white drop-shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center">

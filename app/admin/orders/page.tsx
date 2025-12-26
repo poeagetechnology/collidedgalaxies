@@ -9,12 +9,6 @@ import { OrderDetailsModal } from "@/src/components/admin/orders/orderDetailsMod
 import { OrderFilters } from "@/src/components/admin/orders/orderFilters";
 import { useOrderManagement } from "@/src/hooks/useOrderManagement";
 import type { Order } from "@/src/server/models/order.model";
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 export default function OrdersPage() {
   const { orders, isLoading, handleUpdateStatus } = useOrderManagement();
@@ -61,7 +55,7 @@ export default function OrdersPage() {
     <>
       {/* Mobile Sidebar Overlay */}
       <div
-        className={`fixed inset-0 bg-black z-40 lg:hidden transition-opacity duration-300 ${albertSans.className} ${
+        className={`fixed inset-0 bg-black z-40 lg:hidden transition-opacity duration-300 ${
           sidebarOpen ? "opacity-50 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setSidebarOpen(false)}
@@ -69,7 +63,7 @@ export default function OrdersPage() {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 w-58 h-screen bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${albertSans.className} ${
+        className={`fixed top-0 left-0 w-58 h-screen bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -83,7 +77,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Main Content */}
-      <div className={`${albertSans.className}`}>
+      <div>
         {/* Mobile Header */}
         <div className="lg:hidden bg-white drop-shadow-sm px-4 py-3 flex items-center sticky top-0 z-30">
           <button

@@ -1,10 +1,4 @@
 import React from 'react';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface OrderFiltersProps {
   searchQuery: string;
@@ -20,7 +14,7 @@ export function OrderFilters({
   onStatusChange,
 }: OrderFiltersProps) {
   return (
-    <div className={`mb-6 flex flex-col sm:flex-row gap-4 ${albertSans.className}`}>
+    <div className="mb-6 flex flex-col sm:flex-row gap-4">
       <input
         type="text"
         placeholder="Search by customer name, email, or order ID..."

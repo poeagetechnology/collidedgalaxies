@@ -1,12 +1,6 @@
 'use client';
 
-import { Albert_Sans } from "next/font/google";
 import { useEffect, useState } from "react";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 export default function Success() {
   const [isCOD, setIsCOD] = useState(false);
@@ -17,7 +11,7 @@ export default function Success() {
   }, []);
 
   return (
-    <div className={`h-screen flex flex-col items-center justify-center px-4 text-center ${albertSans.className}`}>
+    <div className="h-screen flex flex-col items-center justify-center px-4 text-center">
       {/* Green Circle with Tick */}
       <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
         <svg

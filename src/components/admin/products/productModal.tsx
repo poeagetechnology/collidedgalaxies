@@ -4,12 +4,6 @@ import React, { useState, useEffect } from 'react';
 import type { Product, ProductFormData, Color, SizeChartOption } from '@/src/server/models/product.model';
 import { uploadToCloudinary } from '@/src/server/services/cloudinary.service';
 import { slugify } from '@/src/server/utils/slugify';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 // Child components (we'll create these next, one-by-one)
 import ProductBasicInfo from "@/src/components/admin/products/productBasicInfo";
@@ -335,7 +329,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
   // --- Render: same modal wrapper and layout, but broken into child components.
   // UI + logic unchanged; each section component will render the exact markup we had
   return (
-    <div className={`fixed inset-0 flex items-center justify-center z-50 p-4 ${albertSans.className}`}>
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
 
       <div className="relative bg-white p-4 sm:p-6 shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto z-50 scrollbar-hide">

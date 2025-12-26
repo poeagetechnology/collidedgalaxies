@@ -3,13 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { X, Loader, Check, X as XIcon } from 'lucide-react';
-import { Albert_Sans } from 'next/font/google';
 import { confirmPasswordReset, verifyPasswordResetCode } from '@/src/server/services/firebaseAuth.service';
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 interface PasswordRequirements {
   length: boolean;
@@ -146,7 +140,7 @@ function ResetPasswordContent() {
   if (isValidating) {
     return (
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm ${albertSans.className}`}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
       >
         <div className="bg-white shadow-2xl w-full max-w-md p-8 text-center">
           <Loader className="w-8 h-8 animate-spin mx-auto text-orange-500 mb-4" />
@@ -160,7 +154,7 @@ function ResetPasswordContent() {
   if (!isCodeValid || !oobCode) {
     return (
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${albertSans.className}`}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <div className="bg-white shadow-2xl w-full max-w-md relative">
 
@@ -184,7 +178,7 @@ function ResetPasswordContent() {
   if (success) {
     return (
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm ${albertSans.className}`}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
       >
         <div className="bg-white shadow-2xl w-full max-w-md">
           <div className="px-10 py-14 text-center">
@@ -203,7 +197,7 @@ function ResetPasswordContent() {
   // Main form state
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm ${albertSans.className}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     >
       <div className="bg-white shadow-2xl w-full max-w-md relative">
         {/* Close Button */}

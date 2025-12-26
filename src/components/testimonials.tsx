@@ -2,17 +2,11 @@
 
 'use client';
 
-import { Albert_Sans } from "next/font/google";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTestimonialManagement } from "@/src/hooks/useTestimonialManagement";
 import TestimonialForm from "./TestimonialForm";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export default function TestimonialsSection() {
   const { testimonials, loading, error, fetchTestimonials } = useTestimonialManagement();
@@ -29,7 +23,7 @@ export default function TestimonialsSection() {
 
   if (loading) {
     return (
-      <section className={`relative w-full bg-white py-12 z-10 ${albertSans.className}`}>
+      <section className="relative w-full bg-white py-12 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center w-full mb-10">
             <h2 className="text-3xl md:text-4xl md:w-[300px] font-semibold leading-tight mb-2 md:mb-0">
@@ -49,7 +43,7 @@ export default function TestimonialsSection() {
 
   if (error || testimonials.length === 0) {
     return (
-      <section className={`relative w-full bg-white py-12 z-10 ${albertSans.className}`}>
+      <section className="relative w-full bg-white py-12 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center w-full mb-10">
             <h2 className="text-3xl md:text-4xl md:w-[300px] font-semibold leading-tight mb-2 md:mb-0">
@@ -86,7 +80,7 @@ export default function TestimonialsSection() {
   }
 
   return (
-    <section className={`relative w-full bg-white py-12 z-10 ${albertSans.className}`}>
+    <section className="relative w-full bg-white py-12 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading Row */}
         <div className="flex flex-col md:flex-row justify-between items-center w-full">

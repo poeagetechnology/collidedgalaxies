@@ -2,12 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, Check } from 'lucide-react';
 import Image from 'next/image';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 interface OrderItem {
   image?: string;
@@ -87,7 +81,7 @@ const TrackOrderModal: React.FC<TrackOrderModalProps> = ({ isOpen, onClose, orde
 
   return (
     <div
-      className={`fixed inset-0 z-100 flex items-center justify-center p-4 transition-all duration-300 ${albertSans.className} ${isClosing ? 'bg-black/0 backdrop-blur-none' : 'bg-black/40 backdrop-blur-sm'
+      className={`fixed inset-0 z-100 flex items-center justify-center p-4 transition-all duration-300 ${isClosing ? 'bg-black/0 backdrop-blur-none' : 'bg-black/40 backdrop-blur-sm'
         }`}
       onClick={handleBackdropClick}
     >

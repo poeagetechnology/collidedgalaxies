@@ -14,15 +14,9 @@ import {
 } from "firebase/firestore";
 import { Menu, X } from "lucide-react";
 import AdminSidebar from "@/src/components/admin/adminSidebar";
-import { Albert_Sans } from "next/font/google";
 
 import { uploadToCloudinary } from "@/src/server/services/cloudinary.service";
 import Image from "next/image";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 export default function MediaManager() {
   const [announcement, setAnnouncement] = useState("");
@@ -228,7 +222,7 @@ export default function MediaManager() {
       />
 
       <div
-        className={`fixed top-0 left-0 w-58 h-screen bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${albertSans.className} ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 left-0 w-58 h-screen bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <button
@@ -241,7 +235,7 @@ export default function MediaManager() {
       </div>
 
       {/* Main Content */}
-      <div className={`${albertSans.className}`}>
+      <div>
         <div className="lg:hidden bg-white drop-shadow-sm px-4 py-3 flex items-center sticky top-0 z-30">
           <button
             onClick={() => setSidebarOpen(true)}

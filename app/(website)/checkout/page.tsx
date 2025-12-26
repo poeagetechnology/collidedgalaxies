@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { Albert_Sans } from "next/font/google";
 import { motion } from "framer-motion";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
@@ -21,11 +20,6 @@ declare global {
     Razorpay: any;
   }
 }
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 
 export default function Checkout() {
@@ -427,7 +421,7 @@ export default function Checkout() {
     <>
       <Navbar />
       <motion.div 
-        className={`min-h-screen bg-gray-50 ${albertSans.className}`}
+        className="min-h-screen bg-gray-50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}

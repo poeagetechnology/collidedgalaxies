@@ -2,12 +2,6 @@
 
 import { useAdminGuard } from '@/src/hooks/useAdminGuard';
 import { ShieldAlert } from 'lucide-react';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -18,7 +12,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
 
   if (isLoading || (isChecking && !showDenied)) {
     return (
-      <div className={`flex min-h-screen items-center justify-center ${albertSans.className}`}>
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
     );
@@ -26,7 +20,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
 
   if (showDenied) {
     return (
-      <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ${albertSans.className}`}>        <div className="relative bg-white p-8 shadow-2xl max-w-md w-full mx-4 animate-shake">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">        <div className="relative bg-white p-8 shadow-2xl max-w-md w-full mx-4 animate-shake">
           <div className="text-center">
             <div className="mx-auto mb-4 w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
               <ShieldAlert className="text-red-600" size={48} />

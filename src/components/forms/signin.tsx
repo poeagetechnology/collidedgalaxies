@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { X, Loader, Check, X as XIcon } from 'lucide-react';
-import { Albert_Sans } from 'next/font/google';
 import { useAuthForm } from '@/src/hooks/useAuthForm';
 import { useGoogleAuth } from '@/src/hooks/useGoogleAuth';
 import { handleAuthSubmit, handleGoogleAuth } from '@/src/server/services/auth.service';
@@ -9,11 +8,6 @@ import { getModalTitle, getSubmitButtonText } from '@/src/server/utils/forms.uti
 import { isPasswordValid } from '@/src/server/utils/password.utils';
 import { PASSWORD_REQUIREMENT_LABELS } from '@/src/server/utils/constants';
 import type { SignInProps } from '@/src/server/models/auth.model';
-
-const albertSans = Albert_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-});
 
 const RequirementItem = ({ met, label }: { met: boolean; label: string }) => (
   <div className="flex items-center gap-2">
@@ -91,7 +85,7 @@ const SignIn: React.FC<SignInProps> = ({ isOpen, onClose }) => {
     <div
       className={`fixed inset-0 z-100 flex items-center justify-center p-4 transition-all duration-350 ease-out ${
         isClosing ? 'bg-black/0 backdrop-blur-none' : 'bg-black/40 backdrop-blur-sm'
-      } ${albertSans.className}`}
+      }`}
       onClick={handleBackdropClick}
     >
       <div

@@ -1,17 +1,11 @@
 'use client';
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { Albert_Sans } from "next/font/google";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { motion } from "framer-motion";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 interface Product {
   id: string;
@@ -277,7 +271,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className={`w-full min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center py-4 ${albertSans.className}`}>
+    <section className="w-full min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center py-4">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 w-full">
         {loading ? (
           <div className="flex items-center justify-center min-h-[60vh]">

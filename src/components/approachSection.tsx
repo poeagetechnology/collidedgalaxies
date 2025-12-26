@@ -1,13 +1,10 @@
 'use client';
 import { motion } from 'framer-motion';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
 
 export default function ApproachSection() {
   return (
     <motion.section 
-      className={`w-full bg-white py-16 md:py-24 ${albertSans.className}`}
+      className="w-full bg-white py-16 md:py-24"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6 }}

@@ -1,12 +1,6 @@
 import React from 'react';
 import { Eye } from 'lucide-react';
 import type { Order } from '@/src/server/models/order.model';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface OrderTableProps {
   orders: Order[];
@@ -31,7 +25,7 @@ export function OrderTable({ orders, onViewDetails, startIndex = 0 }: OrderTable
   };
 
   return (
-    <div className={`overflow-x-auto border border-gray-200 ${albertSans.className}`}>
+    <div className="overflow-x-auto border border-gray-200">
       <table className="min-w-full bg-white">
         <thead className="bg-gray-50">
           <tr>

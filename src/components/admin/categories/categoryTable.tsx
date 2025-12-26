@@ -1,10 +1,4 @@
 import Image from "next/image";
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 type Cat = {
   id: string;
@@ -20,7 +14,7 @@ type Props = {
 
 export default function CategoryTable({ categories, onEdit, onDelete }: Props) {
   return (
-    <div className={`overflow-x-auto mb-10 ${albertSans.className}`}>
+    <div className="overflow-x-auto mb-10">
       <table className="w-full bg-white border border-collapse border-gray-200 shadow-md min-w-max">
         <thead className="bg-gray-100">
           <tr>

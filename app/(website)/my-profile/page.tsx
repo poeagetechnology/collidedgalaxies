@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useEffect, useState, useRef } from "react";
-import { Albert_Sans } from "next/font/google";
 import { motion } from "framer-motion";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
@@ -18,11 +17,6 @@ import {
 	serverTimestamp
 } from "firebase/firestore";
 import Link from "next/link";
-
-const albertSans = Albert_Sans({
-	subsets: ["latin"],
-	weight: ["400", "500", "700"],
-});
 
 type Section = "personal" | "address";
 
@@ -228,7 +222,7 @@ export default function ProfilePage() {
 		<>
 			<Navbar />
 			<motion.main 
-				className={`min-h-screen bg-white ${albertSans.className}`}
+				className="min-h-screen bg-white"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ duration: 0.5 }}

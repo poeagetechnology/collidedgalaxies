@@ -2,15 +2,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Albert_Sans } from "next/font/google";
 import { useCategoryStorage } from "@/src/hooks/useCategoryStorage";
 import { motion } from "framer-motion";
 import { containerVariants, itemVariants } from "@/src/utils/animations";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export default function CollectionsSection() {
   const { categories, isLoading } = useCategoryStorage();
@@ -18,7 +12,7 @@ export default function CollectionsSection() {
 
   if (isLoading) {
     return (
-      <section className={`relative w-full bg-white py-12 z-10 ${albertSans.className}`}>
+      <section className="relative w-full bg-white py-12 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center min-h-[400px]">
             <div className="text-lg text-gray-600">Loading collections...</div>
@@ -30,7 +24,7 @@ export default function CollectionsSection() {
 
   if (categories.length === 0) {
     return (
-      <section className={`relative w-full bg-white py-12 z-10 ${albertSans.className}`}>
+      <section className="relative w-full bg-white py-12 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center w-full mb-10">
             <h2 className="text-3xl md:text-4xl md:w-[250px] text-center md:text-left font-semibold leading-tight mb-2 md:mb-0">
@@ -49,7 +43,7 @@ export default function CollectionsSection() {
   }
 
   return (
-    <section className={`relative w-full bg-white py-12 z-10 ${albertSans.className}`}>
+    <section className="relative w-full bg-white py-12 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div

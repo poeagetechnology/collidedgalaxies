@@ -4,12 +4,6 @@ import React from 'react';
 import type { Product } from '@/src/server/models/product.model';
 import { getCurrentPrice } from '@/src/server/services/product.service';
 import Image from 'next/image';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface ProductTableProps {
   products: Product[];
@@ -23,7 +17,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   onDelete,
 }) => {
   return (
-    <div className={`overflow-x-auto ${albertSans.className}`}>
+    <div className="overflow-x-auto">
       <table className="w-full bg-white border border-collapse border-gray-200 shadow-md min-w-max">
         <thead className="bg-gray-100">
           <tr>

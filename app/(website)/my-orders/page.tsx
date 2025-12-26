@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useEffect, useState } from "react";
-import { Albert_Sans } from "next/font/google";
 import { motion } from "framer-motion";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
@@ -11,12 +10,6 @@ import { collection, query, where, orderBy, onSnapshot } from "firebase/firestor
 import TrackOrderModal from "@/src/components/modals/trackOrderModal";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
-
-const albertSans = Albert_Sans({
-	subsets: ["latin"],
-	weight: ["400", "500", "700"],
-});
 
 // Order status configuration
 const ORDER_STATUSES = {
@@ -112,7 +105,7 @@ export default function OrdersPage() {
 		<>
 			<Navbar />
 			<motion.main 
-				className={`min-h-screen bg-white ${albertSans.className}`}
+				className="min-h-screen bg-white"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ duration: 0.5 }}

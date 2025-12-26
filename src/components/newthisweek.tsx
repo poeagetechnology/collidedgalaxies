@@ -2,12 +2,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { Albert_Sans } from 'next/font/google';
 import { Product } from '@/src/server/models/product.model';
 import { getProductUrl, getCurrentPrice, subscribeToNewArrivals } from '@/src/server/services/product.service';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-const albertSans = Albert_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
 
 export default function NewThisWeek() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,7 +35,7 @@ export default function NewThisWeek() {
   };
 
   return (
-    <section className={`w-full bg-white py-12 ${albertSans.className}`}>
+    <section className="w-full bg-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">

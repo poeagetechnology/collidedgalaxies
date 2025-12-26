@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Albert_Sans } from 'next/font/google';
 import { X } from "lucide-react";
 import {
     collection,
@@ -20,8 +19,6 @@ import { db } from "@/firebase";
 import { useAuth } from "@/src/context/authProvider";
 import ReviewModal from "@/src/components/forms/reviewModal";
 import { limit, startAfter } from "firebase/firestore";
-
-const albertSans = Albert_Sans({ subsets: ['latin'], weight: ['400', '500', '700'] });
 
 interface Review {
     id: string;
@@ -315,7 +312,7 @@ export default function CustomerReviews({ productId }: CustomerReviewsProps) {
         });
 
     return (
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-white ${albertSans.className}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-white">
             <div className="flex w-full items-center justify-between mb-4">
                 <h2 className="text-3xl md:text-4xl text-center md:text-left font-semibold">Customer Reviews</h2>
             </div>

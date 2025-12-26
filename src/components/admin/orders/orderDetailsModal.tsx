@@ -2,12 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import type { Order } from '@/src/server/models/order.model';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 interface OrderDetailsModalProps {
   order: Order | null;
@@ -99,7 +93,7 @@ export function OrderDetailsModal({
 
   return (
     <div
-      className={`fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 ${albertSans.className}`}
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div

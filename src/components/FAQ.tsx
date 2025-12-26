@@ -4,13 +4,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
-import { Albert_Sans } from "next/font/google";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
-
 const faqs = [
   {
     question:
@@ -64,7 +57,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className={`relative w-full bg-white py-12 z-10 ${albertSans.className}`}>
+    <section className="relative w-full bg-white py-12 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <motion.div 

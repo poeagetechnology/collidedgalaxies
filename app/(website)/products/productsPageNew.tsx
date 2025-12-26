@@ -2,22 +2,11 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Albert_Sans, Inria_Serif } from 'next/font/google';
 import { db } from '@/firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { ChevronDown, ChevronLeft, Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import Navbar from '../../../src/components/header';
 import Footer from '../../../src/components/footer';
-
-const albertSans = Albert_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-});
-
-const inriaSerif = Inria_Serif({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-});
 
 type Product = {
   id: string;
@@ -161,7 +150,7 @@ export default function ProductsPageNew() {
   };
 
   return (
-    <div className={albertSans.className}>
+    <div className="w-full">
       <div className="hidden md:block">
         <Navbar />
       </div>
@@ -394,7 +383,7 @@ export default function ProductsPageNew() {
               <button onClick={() => setSidebarOpen(!sidebarOpen)}>
                 <Menu size={22} />
               </button>
-              <Link href="/" className={`text-lg sm:text-xl tracking-wide text-gray-900 ${inriaSerif.className}`}>COGA</Link>
+              <Link href="/" className="text-lg sm:text-xl tracking-wide text-gray-900">COGA</Link>
               <div className="flex gap-2 sm:gap-3">
                 <button>
                   <Search size={18} />

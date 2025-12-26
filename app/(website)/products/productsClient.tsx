@@ -6,17 +6,11 @@ import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
 import Image from "next/image";
 import Link from "next/link";
-import { Albert_Sans } from "next/font/google";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { db } from "@/firebase";
 import { collection, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
 import { useCategoryStorage } from "@/src/hooks/useCategoryStorage";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 // ✅ Helper function to generate product URL
 function getProductUrl(product: { id: string; slug?: string; title?: string }): string {
@@ -625,7 +619,7 @@ function ProductsPageContent() {
   return (
     <>
       <Navbar />
-      <section className={`bg-white min-h-screen ${albertSans.className}`}>
+      <section className="bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-10 md:pt-30 md:pb-10">
           <div className="flex flex-col md:flex-row justify-between items-center w-full pb-10">
             <h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-2 md:mb-0">

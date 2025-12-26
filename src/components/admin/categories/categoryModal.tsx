@@ -1,12 +1,6 @@
 'use client';
 
 import Image from "next/image";
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 type Props = {
   visible: boolean;
@@ -52,7 +46,7 @@ export default function CategoryModal({
   if (!visible) return null;
 
   return (
-    <div className={`fixed inset-0 flex items-center justify-center z-50 p-4 ${albertSans.className}`}>
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
       <div className="relative bg-white p-4 sm:p-6 shadow-lg w-full max-w-sm max-h-[90vh] overflow-y-auto z-50 scrollbar-hide">

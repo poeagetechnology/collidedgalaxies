@@ -1,12 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface Props {
   hasCombos: boolean;
@@ -32,7 +26,7 @@ const ProductCombos: React.FC<Props> = ({
   return (
     <>
       {/* Combo Toggle */}
-      <div className={`mb-2 flex items-center ${albertSans.className}`}>
+      <div className="mb-2 flex items-center">
         <label className="mr-3 font-semibold text-sm">
           Does this product have combos?
         </label>

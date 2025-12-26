@@ -1,15 +1,9 @@
 'use client';
 import { useCart, CartItem } from '@/src/context/CartContext';
 import { toast } from 'react-hot-toast';
-import { Albert_Sans } from 'next/font/google';
 import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-
-const albertSans = Albert_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '700']
-});
 
 export default function CartDrawer() {
   const { cartItems, isCartOpen, setIsCartOpen, removeFromCart, incrementQuantity, decrementQuantity } = useCart();
@@ -125,7 +119,7 @@ export default function CartDrawer() {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:max-w-sm md:max-w-[420px] z-100 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${albertSans.className} ${isCartOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-full sm:max-w-sm md:max-w-[420px] z-100 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isCartOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         {/* Close button */}

@@ -1,9 +1,8 @@
 'use client';
 import React, { useState, useEffect, Suspense } from 'react';
-import { Menu, X, User, LogOut, Settings, ListOrdered } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, ListOrdered, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Albert_Sans, Inria_Serif } from 'next/font/google';
 import SignIn from '@/src/components/forms/signin';
 import { useAuth, logout } from '@/src/context/authProvider';
 import { useCart } from '@/src/context/CartContext';
@@ -12,9 +11,6 @@ import { useCategoryStorage } from '@/src/hooks/useCategoryStorage';
 import { toast } from 'react-hot-toast';
 import { fetchUserData, isUserAdmin } from '@/src/server/services/user.service';
 import AnnouncementBar from './announcement';
-
-const albertSans = Albert_Sans({ subsets: ['latin'], weight: ['400', '500', '700'] });
-const inriaSerif = Inria_Serif({ subsets: ['latin'], weight: ['400', '700'] });
 
 function NavbarContent() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +21,7 @@ function NavbarContent() {
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [isNavDropdownOpen, setIsNavDropdownOpen] = useState(false);
   const { toggleCart, cartItems } = useCart();
   const router = useRouter();
   const pathname = usePathname();
@@ -87,33 +84,93 @@ function NavbarContent() {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 w-full z-100 bg-white ${albertSans.className}`}>
+      <nav className="fixed top-0 left-0 w-full z-100 bg-white">
         <div className="w-full mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-14 sm:h-16">
 
-            {/* Left Navigation */}
-            {showNavLinks && (
-              <div className="hidden md:flex items-center space-x-10 text-gray-700 text-sm font-medium">
-                <Link href="/about" className={`hover:text-black transition-colors ${pathname === '/about' ? 'underline underline-offset-6 decoration-2 decoration-black' : ''}`}>About</Link>
+            {/* Left side - Logo and Navigation Dropdown */}
+            <div className="flex items-center gap-4">
+              {/* Logo */}
+              <Link href="/" className="flex items-center">
+                <Image
+                  src="/COGA_Favicon.svg"
+                  alt="COGA Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
+              </Link>
 
-                <div className="relative inline-block" onMouseEnter={handleProductsEnter} onMouseLeave={handleProductsLeave}>
-                  <button onClick={() => { sessionStorage.removeItem('productFilters'); sessionStorage.removeItem('productSort'); router.push('/products'); }} className={`hover:text-black transition-colors ${pathname === '/products' ? 'underline underline-offset-6 decoration-2 cursor-pointer decoration-black' : ''}`}>Products</button>
+              
 
-                  {showProductsPopup && !isLoading && categories.length > 0 && (
-                    <div className="absolute left-1 -translate-x-1/6 top-full mt-0 min-w-[220px] bg-white shadow-xl border border-gray-200 text-gray-800 z-100 flex flex-col pointer-events-auto" onMouseEnter={handleProductsEnter} onMouseLeave={handleProductsLeave}>
-                      {categories.map((cat) => (
-                        <Link key={cat.id || cat.name} href={`/products?category=${encodeURIComponent(cat.name)}`} className={`px-8 py-4 text-sm text-gray-700 hover:bg-gray-100 transition whitespace-nowrap ${activeCategory === cat.name ? 'underline decoration-1 decoration-black underline-offset-4' : ''}`}>{cat.name}</Link>
-                      ))}
-                    </div>
+            {/* Center Logo - Hidden on mobile, shown on desktop */}
+            <Link href="/" className="hidden md:block text-lg sm:text-2xl tracking-wide text-gray-900">COGA</Link>
+
+{/* Navigation Dropdown */}
+              {showNavLinks && (
+                <div className="relative">
+                  <button
+                    onClick={() => setIsNavDropdownOpen(!isNavDropdownOpen)}
+                    className="hidden md:flex items-center gap-2 text-gray-700 hover:text-black transition-colors text-sm font-medium"
+                  >
+                    Menu
+                    <ChevronDown size={16} className={`transition-transform ${isNavDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isNavDropdownOpen && (
+                    <>
+                      <div className="absolute left-0 top-full mt-2 w-48 bg-white shadow-lg border border-gray-200 z-100">
+                        <Link
+                          href="/about"
+                          className={`block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors ${pathname === '/about' ? 'bg-gray-50 font-medium' : ''}`}
+                          onClick={() => setIsNavDropdownOpen(false)}
+                        >
+                          About
+                        </Link>
+
+                        <div className="relative">
+                          <button
+                            onClick={() => {
+                              setShowProductsPopup(!showProductsPopup);
+                            }}
+                            className={`w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors ${pathname === '/products' ? 'bg-gray-50 font-medium' : ''}`}
+                          >
+                            Products
+                          </button>
+
+                          {showProductsPopup && !isLoading && categories.length > 0 && (
+                            <div className="absolute left-full top-0 ml-1 w-48 bg-white shadow-lg border border-gray-200 z-100">
+                              {categories.map((cat) => (
+                                <Link
+                                  key={cat.id || cat.name}
+                                  href={`/products?category=${encodeURIComponent(cat.name)}`}
+                                  className={`block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors ${activeCategory === cat.name ? 'bg-gray-50 font-medium' : ''}`}
+                                  onClick={() => {
+                                    setIsNavDropdownOpen(false);
+                                    setShowProductsPopup(false);
+                                  }}
+                                >
+                                  {cat.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <Link
+                          href="/contact"
+                          className={`block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors ${pathname === '/contact' ? 'bg-gray-50 font-medium' : ''}`}
+                          onClick={() => setIsNavDropdownOpen(false)}
+                        >
+                          Contact
+                        </Link>
+                      </div>
+                      <div className="fixed inset-0 z-90" onClick={() => setIsNavDropdownOpen(false)} />
+                    </>
                   )}
                 </div>
-
-                <Link href="/contact" className={`hover:text-black transition-colors ${pathname === '/contact' ? 'underline underline-offset-6 decoration-2 decoration-black' : ''}`}>Contact</Link>
-              </div>
-            )}
-
-            {/* Center Logo */}
-            <Link href="/" className={`text-lg sm:text-2xl tracking-wide text-gray-900 md:absolute md:left-1/2 md:-translate-x-1/2 ${inriaSerif.className}`}>COGA</Link>
+              )}
+            </div>
 
             {/* Right side */}
             <div className="flex items-center gap-3 sm:gap-4 md:gap-6 ml-auto">
@@ -171,9 +228,20 @@ function NavbarContent() {
 
       {/* Mobile Drawer - keeping same structure, just cleaner */}
       {showNavLinks && (
-        <aside className={`fixed top-0 right-0 h-full w-full max-w-xs sm:max-w-sm bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-100 md:hidden ${albertSans.className} ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <aside className={`fixed top-0 right-0 h-full w-full max-w-xs sm:max-w-sm bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-100 md:hidden ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-3 sm:p-5 flex flex-col space-y-4 sm:space-y-6 text-gray-800 font-medium h-full">
-            <div className="flex justify-end mb-6"><button onClick={() => { setIsOpen(false); setMobileProductsOpen(false); }}><X size={26} /></button></div>
+            <div className="flex justify-between items-center mb-6">
+              <Link href="/" className="flex items-center" onClick={() => setIsOpen(false)}>
+                <Image
+                  src="/COGA_Favicon.svg"
+                  alt="COGA Logo"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
+              </Link>
+              <button onClick={() => { setIsOpen(false); setMobileProductsOpen(false); }}><X size={26} /></button>
+            </div>
 
             {user && (
               <div className="mb-4 pb-6 border-b border-gray-200 flex items-center gap-4">

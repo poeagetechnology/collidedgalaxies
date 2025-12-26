@@ -3,14 +3,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Send } from 'lucide-react';
-import { Albert_Sans } from 'next/font/google';
 import { useTestimonialManagement } from '@/src/hooks/useTestimonialManagement';
 import { useAuth } from '../hooks/useAuth';
-
-const albertSans = Albert_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-});
 
 interface TestimonialFormProps {
   onSuccess?: () => void;
@@ -31,7 +25,7 @@ export default function TestimonialForm({ onSuccess }: TestimonialFormProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`w-full bg-blue-50 border-2 border-blue-200 rounded-lg p-6 text-center ${albertSans.className}`}
+        className="w-full bg-blue-50 border-2 border-blue-200 rounded-lg p-6 text-center"
       >
         <h3 className="text-lg font-semibold text-blue-900 mb-2">Sign In to Share Your Experience</h3>
         <p className="text-blue-800 mb-4">Please log in to post your testimonial and help our community.</p>
@@ -50,7 +44,7 @@ export default function TestimonialForm({ onSuccess }: TestimonialFormProps) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className={`w-full bg-green-50 border-2 border-green-200 rounded-lg p-8 text-center ${albertSans.className}`}
+        className="w-full bg-green-50 border-2 border-green-200 rounded-lg p-8 text-center"
       >
         <div className="flex justify-center mb-4">
           <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center">
@@ -118,7 +112,7 @@ export default function TestimonialForm({ onSuccess }: TestimonialFormProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`w-full max-w-2xl mx-auto bg-white border-2 border-gray-200 rounded-2xl p-8 ${albertSans.className}`}
+      className="w-full max-w-2xl mx-auto bg-white border-2 border-gray-200 rounded-2xl p-8"
     >
       <h3 className="text-2xl font-bold text-gray-900 mb-2">Share Your Experience</h3>
       <p className="text-gray-600 mb-6">Help other customers by sharing your honest feedback about COGA products</p>

@@ -3,17 +3,15 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useCart } from '@/src/context/CartContext';
-import { Albert_Sans } from 'next/font/google';
 import { useAuth } from "@/src/context/authProvider";
 import SignIn from "../../../../src/components/forms/signin";
 import Navbar from "../../../../src/components/header";
 import Footer from "../../../../src/components/footer";
-import { ChevronLeft, ChevronRight, Heart, Share2, Menu, X, Plus, Minus } from "lucide-react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { ChevronLeft, ChevronRight, Heart, Share2, Menu, X, Plus, Minus, Zap } from "lucide-react";
 import { db } from "@/firebase";
 import Link from "next/link";
-
-const albertSans = Albert_Sans({ subsets: ['latin'], weight: ['400', '500', '700'] });
+import RelatedProducts from "@/src/components/relatedProducts";
+import ProductReviewsSection from "@/src/components/productReviewsSection";
 
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='800'%20height='800'%3E%3Crect%20fill='%23f3f4f6'%20width='100%25'%20height='100%25'/%3E%3Ctext%20x='50%25'%20y='50%25'%20dominant-baseline='middle'%20text-anchor='middle'%20fill='%23999'%20font-size='24'%3ENo%20image%3C/text%3E%3C/svg%3E";
 
@@ -24,8 +22,6 @@ interface ProductDetailsClientProps {
 
 export default function ProductDetailsClient({ initialProduct, slug }: ProductDetailsClientProps) {
   const [product] = useState(initialProduct);
-  const [averageRating, setAverageRating] = useState<number>(0);
-  const [totalReviews, setTotalReviews] = useState<number>(0);
 
   const { addToCart, setIsCartOpen } = useCart();
   const { user } = useAuth();
@@ -38,38 +34,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showMobileDetails, setShowMobileDetails] = useState(false);
-
-  // Fetch rating data
-  useEffect(() => {
-    const fetchRatingData = async () => {
-      if (!product?.id) return;
-
-      try {
-        const q = query(
-          collection(db, "reviews"),
-          where("productId", "==", product.id)
-        );
-
-        const querySnapshot = await getDocs(q);
-        const reviews: any[] = [];
-
-        querySnapshot.forEach((doc) => {
-          reviews.push(doc.data());
-        });
-
-        if (reviews.length > 0) {
-          const total = reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-          const avg = total / reviews.length;
-          setAverageRating(Number(avg.toFixed(1)));
-          setTotalReviews(reviews.length);
-        }
-      } catch (error) {
-        console.error("Error fetching rating data:", error);
-      }
-    };
-
-    fetchRatingData();
-  }, [product?.id]);
+  const [isDirectBuying, setIsDirectBuying] = useState(false);
 
   // Initialize selected size and color
   useEffect(() => {
@@ -140,6 +105,64 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
     }, 500);
   };
 
+  const handleDirectBuy = async () => {
+    if (!user) {
+      setIsSignInOpen(true);
+      return;
+    }
+
+    if (!product || !selectedSize || !selectedColor) {
+      alert("Please select size and color");
+      return;
+    }
+
+    const selectedColorObj =
+      product?.colors?.find((c: any) =>
+        typeof c === 'string'
+          ? c === selectedColor
+          : c.hex === selectedColor
+      ) ||
+      (product?.colors?.[0]
+        ? (typeof product.colors[0] === 'string'
+          ? { name: product.colors[0], hex: product.colors[0] }
+          : product.colors[0])
+        : { name: 'Default', hex: '#ECE9E6' });
+
+    setIsDirectBuying(true);
+
+    try {
+      const response = await fetch('/api/direct-buy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          productId: product.id,
+          productTitle: product.title,
+          price: product.price ?? product.discountPriceFirst10Days ?? 0,
+          quantity,
+          size: selectedSize,
+          color: selectedColorObj,
+          userEmail: user.email,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Redirect to checkout or order confirmation
+        window.location.href = `/checkout?directBuyId=${data.directBuyId}`;
+      } else {
+        alert('Failed to process direct buy. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during direct buy:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setIsDirectBuying(false);
+    }
+  };
+
   if (!product) {
     return null;
   }
@@ -149,7 +172,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
   return (
     <>
       <Navbar />
-      <div className={`bg-white min-h-screen ${albertSans.className}`}>
+      <div className="bg-white min-h-screen">
         {/* Desktop Header Navigation */}
         <div className="hidden md:flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <Link href="/products" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors">
@@ -281,17 +304,9 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
 
             <h1 className="text-3xl md:text-4xl font-bold mb-2">{product?.title}</h1>
 
-            {/* Price and Rating */}
+            {/* Price */}
             <div className="flex items-center gap-4 mb-4">
               <div className="text-2xl font-semibold">₹{product?.price ?? product?.discountPriceFirst10Days ?? '—'}</div>
-              {totalReviews > 0 && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm font-medium">{averageRating}★</span>
-                    <span className="text-xs text-gray-600">({totalReviews})</span>
-                  </div>
-                </div>
-              )}
             </div>
 
             <p className="text-gray-600 text-base leading-relaxed">
@@ -372,7 +387,15 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
               disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
               className="flex-1 bg-black text-white py-3 font-semibold hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
-              {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD'}
+              {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD TO CART'}
+            </button>
+            <button
+              onClick={handleDirectBuy}
+              disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
+              className="flex-1 bg-orange-500 text-white py-3 font-semibold hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            >
+              <Zap size={18} />
+              {isOutOfStock ? 'Out of Stock' : isDirectBuying ? 'Processing...' : 'BUY NOW'}
             </button>
           </div>
         </div>
@@ -380,26 +403,25 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
 
       {/* Mobile: Fixed Bottom CTA */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 safe-area-inset-bottom">
-        <div className="flex gap-3">
-          <button
-            onClick={() => setIsWishlisted(!isWishlisted)}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 border-2 rounded-lg transition-colors ${
-              isWishlisted ? 'bg-red-100 border-red-600 text-red-600' : 'border-gray-300 text-gray-700'
-            }`}
-          >
-            <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} />
-            <span className="text-sm font-semibold">Save</span>
-          </button>
+        <div className="flex gap-3 mb-3">
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
             className="flex-1 bg-black text-white py-3 font-semibold rounded-lg hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
-            {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD'}
+            {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD TO CART'}
+          </button>
+          <button
+            onClick={handleDirectBuy}
+            disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
+            className="flex-1 bg-orange-500 text-white py-3 font-semibold rounded-lg hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          >
+            <Zap size={16} />
+            {isOutOfStock ? 'Out of Stock' : isDirectBuying ? 'Processing...' : 'BUY NOW'}
           </button>
         </div>
         {/* Quantity Controls for Mobile */}
-        <div className="mt-3 flex items-center gap-2 bg-gray-100 rounded-lg p-2 w-fit">
+        <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-2 w-fit">
           <button
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
             disabled={isOutOfStock}
@@ -420,6 +442,15 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
 
       {/* SignIn Modal */}
       <SignIn isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
+
+      {/* Product Reviews Section */}
+      <ProductReviewsSection productId={product.id} />
+
+      {/* Related Products Section */}
+      <RelatedProducts 
+        currentProductId={product.id} 
+        currentCategory={product.category}
+      />
       </div>
       <Footer />
     </>

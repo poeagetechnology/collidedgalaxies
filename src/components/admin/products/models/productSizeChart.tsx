@@ -3,12 +3,6 @@
 import React from 'react';
 import type { SizeChartOption } from '@/src/server/models/product.model';
 import Image from 'next/image';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface Props {
   formSizeChart: string;
@@ -44,7 +38,7 @@ const ProductSizeChart: React.FC<Props> = ({
   setShowSizeChartSelector,
 }) => {
   return (
-    <div className={`border p-3 sm:p-4 flex flex-col gap-3 ${albertSans.className}`}>
+    <div className="border p-3 sm:p-4 flex flex-col gap-3">
       <h2 className="font-semibold text-sm sm:text-base">Size Chart (Optional)</h2>
 
       {/* Current Size Chart */}

@@ -2,18 +2,7 @@
 'use client';
 import Image from "next/image";
 import Link from "next/link";
-import { Albert_Sans, Inria_Serif } from "next/font/google";
 import { motion } from "framer-motion";
-
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const inriaSerif = Inria_Serif({
-  subsets: ['latin'],
-  weight: ["400", "700"],
-});
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -37,7 +26,7 @@ const itemVariants = {
 
 export default function Footer() {
   return (
-    <footer className={`relative bg-black text-white pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 z-10 ${albertSans.className}`}>
+    <footer className="relative bg-black text-white pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 z-10">
       {/* ✅ Container */}
       <motion.div 
         className="w-full mx-auto px-2 sm:px-4 md:px-6 lg:px-8 flex flex-col md:flex-row md:justify-between md:items-start gap-8 sm:gap-12 md:gap-20 max-w-7xl"
@@ -50,7 +39,7 @@ export default function Footer() {
         {/* ✅ Left: Logo & Slogan */}
         <motion.div className="flex flex-col gap-3 sm:gap-4 md:gap-5 md:w-1/3 text-left" variants={itemVariants}>
           <motion.h2 
-            className={`text-2xl sm:text-3xl md:text-[3rem] tracking-wide leading-none ${inriaSerif.className}`}
+            className="text-2xl sm:text-3xl md:text-[3rem] tracking-wide leading-none"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}

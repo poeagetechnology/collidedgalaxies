@@ -1,10 +1,130 @@
 @import "tailwindcss";
 
-html {
-  scroll-behavior: smooth;
+/* Beatrice Deck Trial Font - Local Files from /public/fonts/ */
+
+/* Thin Weight */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-Thin-BF64829e8e21d70.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-Thin-BF64829e916c302.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
+/* Light Weight */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-Light-BF64829e8e6b5e8.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-Light-BF64829e9192d32.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Regular Weight */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-Regular-BF64829e8e41476.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-Regular-BF64829e9182459.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Medium Weight */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-Medium-BF64829e8e8d71a.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-Medium-BF64829e9193070.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Semibold Weight */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-Semibold-BF64829e8dec396.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-Semibold-BF64829e917c775.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Bold Weight */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-Bold-BF64829e8e9ca08.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-Bold-BF64829e916f5e9.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Extrabold Weight */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-Extrabold-BF64829e8ed31e6.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-Extrabold-BF64829e919604b.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Regular Italic */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-RegularItalic-BF64829e917f76b.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-RegularItalic-BF64829e9193ab8.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Bold Italic */
+@font-face {
+  font-family: 'Beatrice Deck';
+  src: url('/fonts/BeatriceDeckTRIAL-BoldItalic-BF64829e9186236.otf') format('opentype'),
+       url('/fonts/BeatriceDeckTRIAL-BoldItalic-BF64829e918c7cd.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* Apply Beatrice Deck font globally */
+* {
+  font-family: 'Beatrice Deck', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Ensure headings display with proper weights */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Beatrice Deck', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Font weight utilities */
+.font-thin {
+  font-weight: 100;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-extrabold {
+  font-weight: 800;
+}
+
+html {
+  scroll-behavior: smooth;
+}.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 

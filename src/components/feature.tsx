@@ -1,12 +1,7 @@
 'use client';
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Albert_Sans } from "next/font/google";
 
-const albertSans = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export default function FeaturesBar() {
   const features = [
@@ -46,7 +41,7 @@ export default function FeaturesBar() {
 
   return (
     <motion.section 
-      className={`relative w-full bg-white pt-12 pb-24 z-10 ${albertSans.className}`}
+      className="relative w-full bg-white pt-12 pb-24 z-10"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6 }}

@@ -6,14 +6,8 @@ import Navbar from '../../../src/components/header';
 import Footer from '../../../src/components/footer';
 import FeaturesBar from '../../../src/components/feature';
 import { useEffect, useRef, useState } from 'react';
-import { Albert_Sans } from 'next/font/google';
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 export default function AboutPage() {
     const imageRef = useRef<HTMLDivElement>(null);
@@ -117,7 +111,7 @@ export default function AboutPage() {
         <>
             <Navbar />
             <motion.div 
-              className={`min-h-screen bg-white ${albertSans.className}`}
+              className="min-h-screen bg-white"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}

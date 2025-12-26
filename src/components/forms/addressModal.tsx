@@ -5,12 +5,6 @@ import Image from 'next/image';
 import { AddressFormData } from '@/src/server/models/address.model';
 import { INDIAN_STATES, EMPTY_ADDRESS } from '@/src/server/utils/constants';
 import { validateAddress } from '@/src/server/services/address.service';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface AddressModalProps {
   isOpen: boolean;
@@ -64,7 +58,7 @@ const AddressModal: React.FC<AddressModalProps> = ({ isOpen, onClose, onSave, in
 
   return (
     <div
-      className={`fixed inset-0 z-100 flex items-center justify-center p-4 transition-all duration-300 ${albertSans.className} ${
+      className={`fixed inset-0 z-100 flex items-center justify-center p-4 transition-all duration-300 ${
         isClosing ? 'bg-black/0 backdrop-blur-none' : 'bg-black/40 backdrop-blur-sm'
       }`}
       onClick={handleBackdropClick}

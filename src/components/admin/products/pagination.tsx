@@ -2,12 +2,6 @@
 
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Albert_Sans } from 'next/font/google';
-
-const albertSans = Albert_Sans({
-    subsets: ["latin"],
-    weight: ["400", "500", "700"],
-});
 
 interface PaginationProps {
   currentPage: number;
@@ -30,7 +24,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   if (totalItems === 0) return null;
 
   return (
-    <div className={`py-8 flex flex-col sm:flex-row items-center justify-between gap-4 ${albertSans.className}`}>
+    <div className="py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="text-sm text-gray-600">
         Showing {startIndex + 1} to {endIndex} of {totalItems} products
       </div>
