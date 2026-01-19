@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export default function NewThisWeek() {
   const [products, setProducts] = useState<Product[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsub = subscribeToNewArrivals(setProducts, 8);
@@ -65,12 +66,16 @@ export default function NewThisWeek() {
                   <div key={product.id} className="flex flex-col group">
                     {/* Product Image */}
                     <Link href={productUrl}>
-                      <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4 cursor-pointer">
+                      <div 
+                        className="relative aspect-square bg-gray-100 overflow-hidden mb-4 cursor-pointer"
+                        onMouseEnter={() => setHoveredProductId(product.id)}
+                        onMouseLeave={() => setHoveredProductId(null)}
+                      >
                         <Image
-                          src={displayImage}
+                          src={hoveredProductId === product.id && product.images && product.images[1] ? product.images[1] : displayImage}
                           alt={product.title ?? 'product'}
                           fill
-                          className={`object-cover object-center transition-transform duration-300 group-hover:scale-105 ${
+                          className={`object-cover object-center transition-transform duration-300 ${
                             isOutOfStock ? 'opacity-60 grayscale' : ''
                           }`}
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
