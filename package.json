@@ -22,7 +22,7 @@
     "lucide-react": "^0.545.0",
     "next": "^16.1.0",
     "postcss": "^8.5.6",
-    "razorpay": "^2.9.6",
+    "@cashfreepayments/cashfree-js": "^1.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hot-toast": "^2.6.0",

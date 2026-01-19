@@ -25,7 +25,7 @@ const faqs = [
   {
     question: "Which payment methods do you accept?",
     answer:
-      "We accept all major debit/credit cards, UPI apps (Google Pay, PhonePe, Paytm), and net banking. All payments are securely processed through Razorpay.",
+      "We accept all major debit/credit cards, UPI apps (Google Pay, PhonePe, Paytm), and net banking. All payments are securely processed through Cashfree Payment Gateway.",
   },
 ];
 
@@ -68,7 +68,7 @@ export default function FAQ() {
           viewport={{ once: false, margin: "-50px" }}
         >
           <motion.h1 
-            className="text-3xl md:text-4xl text-center md:text-left md:w-[300px] font-semibold leading-tight mb-2 md:mb-0"
+            className="text-3xl md:text-4xl text-center md:text-left md:w-75 font-semibold leading-tight mb-2 md:mb-0"
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -77,7 +77,7 @@ export default function FAQ() {
             Frequently Asked Questions
           </motion.h1>
           <motion.p 
-            className="text-base md:text-lg text-gray-700 text-center md:w-[250px] md:text-right"
+            className="text-base md:text-lg text-gray-700 text-center md:w-62.5 md:text-right"
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}

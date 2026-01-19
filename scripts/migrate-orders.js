@@ -44,8 +44,8 @@ async function migrate() {
   for (const doc of snapshot.docs) {
     const data = doc.data();
     const updates = {};
-    if (!('status' in data)) updates.status = data.razorpayPaymentId ? 'processing' : 'pending';
-    if (!('paymentStatus' in data)) updates.paymentStatus = data.razorpayPaymentId ? 'paid' : 'pending';
+    if (!('status' in data)) updates.status = data.cashfreePaymentId ? 'processing' : 'pending';
+    if (!('paymentStatus' in data)) updates.paymentStatus = data.cashfreePaymentId ? 'paid' : 'pending';
     if (!('createdAt' in data)) updates.createdAt = admin.firestore.FieldValue.serverTimestamp();
     if (!('updatedAt' in data)) updates.updatedAt = admin.firestore.FieldValue.serverTimestamp();
 

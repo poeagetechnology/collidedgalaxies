@@ -14,6 +14,7 @@ import Link from "next/link";
 import RelatedProducts from "@/src/components/relatedProducts";
 import ProductReviewsSection from "@/src/components/productReviewsSection";
 import toast from "react-hot-toast";
+import { createShiprocketOrder, ShiprocketCustomer } from '@/src/utils/shiprocket-order.utils';
 
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='800'%20height='800'%3E%3Crect%20fill='%23f3f4f6'%20width='100%25'%20height='100%25'/%3E%3Ctext%20x='50%25'%20y='50%25'%20dominant-baseline='middle'%20text-anchor='middle'%20fill='%23999'%20font-size='24'%3ENo%20image%3C/text%3E%3C/svg%3E";
 
@@ -252,6 +253,61 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
     }
   };
 
+  const handleShiprocketCheckout = async () => {
+    if (!product || !selectedSize || !selectedColor) {
+      toast.error('Please select size and color');
+      return;
+    }
+
+    if (!user) {
+      setIsSignInOpen(true);
+      return;
+    }
+
+    setIsDirectBuying(true);
+
+    try {
+      // Prepare customer data from Firebase
+      const userRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data() || {};
+
+      // Get default address or use provided data
+      const defaultAddress = userData.addresses?.[0] || {};
+
+      const customer: ShiprocketCustomer = {
+        name: userData.fullName || user.displayName || 'Customer',
+        email: user.email || '',
+        phone: userData.phone || '9999999999',
+        address: defaultAddress.address || 'Address not set',
+        city: defaultAddress.city || 'City',
+        state: defaultAddress.state || 'State',
+        pincode: defaultAddress.pincode || '000000',
+        country: 'India'
+      };
+
+      // Create order on Shiprocket
+      const result = await createShiprocketOrder(
+        {
+          id: product.id,
+          name: product.title,
+          price: product.price ?? product.discountPriceFirst10Days ?? 0,
+          quantity: quantity
+        },
+        customer,
+        'Default'
+      );
+
+      // Redirect to success page
+      window.location.href = `/success?order_id=${result.order_id}&payment_gateway=shiprocket`;
+    } catch (error) {
+      console.error('Shiprocket order error:', error);
+      toast.error('Failed to create order');
+    } finally {
+      setIsDirectBuying(false);
+    }
+  };
+
   if (!product) {
     return null;
   }
@@ -440,38 +496,48 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
             </div>
 
             {/* Quantity and Add to Cart - Desktop */}
-            <div className="hidden md:flex gap-3">
-              <div className="flex items-center border border-gray-300">
+            <div className="hidden md:flex flex-col gap-3">
+              <div className="flex gap-3">
+                <div className="flex items-center border border-gray-300">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={isOutOfStock}
+                    className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
+                  >
+                    <Minus size={18} />
+                  </button>
+                  <span className="px-4 py-2 font-medium">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    disabled={isOutOfStock}
+                    className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
+                  >
+                    <Plus size={18} />
+                  </button>
+                </div>
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={isOutOfStock}
-                  className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
+                  className="flex-1 bg-black text-white py-3 font-semibold hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
-                  <Minus size={18} />
+                  {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD TO CART'}
                 </button>
-                <span className="px-4 py-2 font-medium">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  disabled={isOutOfStock}
-                  className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
+                  onClick={handleDirectBuy}
+                  disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
+                  className="flex-1 bg-orange-500 text-white py-3 font-semibold hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
-                  <Plus size={18} />
+                  <Zap size={18} />
+                  {isOutOfStock ? 'Out of Stock' : isDirectBuying ? 'Processing...' : 'BUY NOW'}
                 </button>
               </div>
+              {/* Shiprocket Button */}
               <button
-                onClick={handleAddToCart}
-                disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
-                className="flex-1 bg-black text-white py-3 font-semibold hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                onClick={handleShiprocketCheckout}
+                disabled={isOutOfStock || !selectedSize || !selectedColor}
+                className="w-full bg-blue-600 text-white py-3 font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD TO CART'}
-              </button>
-              <button
-                onClick={handleDirectBuy}
-                disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
-                className="flex-1 bg-orange-500 text-white py-3 font-semibold hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-              >
-                <Zap size={18} />
-                {isOutOfStock ? 'Out of Stock' : isDirectBuying ? 'Processing...' : 'BUY NOW'}
+                {isOutOfStock ? 'Out of Stock' : 'SHIP WITH SHIPROCKET'}
               </button>
             </div>
           </div>
@@ -479,41 +545,51 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
 
         {/* Mobile: Fixed Bottom CTA */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 safe-area-inset-bottom z-50">
-          <div className="flex items-center gap-2">
-            {/* Quantity Controls for Mobile */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1.5">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              {/* Quantity Controls for Mobile */}
+              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1.5">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={isOutOfStock}
+                  className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                >
+                  <Minus size={14} />
+                </button>
+                <span className="px-2.5 py-1 font-medium text-xs">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  disabled={isOutOfStock}
+                  className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+              {/* Add to Cart Button */}
               <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={isOutOfStock}
-                className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                onClick={handleAddToCart}
+                disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
+                className="flex-1 bg-black text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                <Minus size={14} />
+                {isOutOfStock ? 'Out' : isAddingToCart ? 'Adding...' : 'ADD'}
               </button>
-              <span className="px-2.5 py-1 font-medium text-xs">{quantity}</span>
+              {/* Buy Now Button */}
               <button
-                onClick={() => setQuantity(quantity + 1)}
-                disabled={isOutOfStock}
-                className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                onClick={handleDirectBuy}
+                disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
+                className="flex-1 bg-orange-500 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
               >
-                <Plus size={14} />
+                <Zap size={14} />
+                {isOutOfStock ? 'Out' : isDirectBuying ? 'Wait...' : 'BUY'}
               </button>
             </div>
-            {/* Add to Cart Button */}
+            {/* Shiprocket Button */}
             <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
-              className="flex-1 bg-black text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              onClick={handleShiprocketCheckout}
+              disabled={isOutOfStock || !selectedSize || !selectedColor}
+              className="w-full bg-blue-600 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
-              {isOutOfStock ? 'Out' : isAddingToCart ? 'Adding...' : 'ADD'}
-            </button>
-            {/* Buy Now Button */}
-            <button
-              onClick={handleDirectBuy}
-              disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
-              className="flex-1 bg-orange-500 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
-            >
-              <Zap size={14} />
-              {isOutOfStock ? 'Out' : isDirectBuying ? 'Wait...' : 'BUY'}
+              {isOutOfStock ? 'Out' : 'SHIPROCKET'}
             </button>
           </div>
         </div>

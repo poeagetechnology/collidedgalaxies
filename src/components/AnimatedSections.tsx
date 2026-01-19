@@ -333,7 +333,7 @@ export function AnimatedGradientText({
 }: AnimatedGradientTextProps) {
   return (
     <motion.div
-      className={`bg-gradient-to-r ${colors.join(
+      className={`bg-linear-to-r ${colors.join(
         ' '
       )} bg-clip-text text-transparent ${className}`}
       animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
@@ -418,7 +418,7 @@ export function ScrollProgress() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 z-50"
+      className="fixed top-0 left-0 right-0 h-1 bg-linear-to-r from-purple-600 via-pink-600 to-red-600 z-50"
       style={{ scaleX: progress / 100 }}
       transformTemplate={({ scaleX }) => `scaleX(${scaleX})`}
     />

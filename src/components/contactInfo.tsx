@@ -7,13 +7,13 @@ export default function ContactInfo() {
     const contactItems = [
         {
             label: "Email:",
-            href: "mailto:collidedgalaxies.info@gmail.com",
-            text: "collidedgalaxies.info@gmail.com",
+            href: "mailto:customercare@collidedgalaxies.com",
+            text: "customercare@collidedgalaxies.com",
         },
         {
             label: "Phone:",
-            href: "tel:+919025865018",
-            text: "+91 90258 65018",
+            href: "tel:+919345373199",
+            text: "+91 93453 73199",
         },
         {
             label: "Instagram DM:",

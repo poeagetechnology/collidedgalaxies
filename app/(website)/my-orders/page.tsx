@@ -127,7 +127,7 @@ export default function OrdersPage() {
 							My Orders
 						</motion.h1>
 						<motion.p 
-							className="text-base md:text-lg text-gray-700 text-center md:w-[300px] md:text-right"
+							className="text-base md:text-lg text-gray-700 text-center md:w-75 md:text-right"
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ duration: 0.5, delay: 0.2 }}
@@ -214,7 +214,7 @@ export default function OrdersPage() {
 											: "No completed orders yet. Your shopping adventure awaits!"}
 									</p>
 									<button
-										className="w-[200px] md:w-[500px] py-2 border cursor-pointer border-black font-semibold text-base hover:bg-gray-100"
+										className="w-50 md:w-125 py-2 border cursor-pointer border-black font-semibold text-base hover:bg-gray-100"
 										onClick={() => { router.push("/products") }}
 									>
 										Continue Shopping
@@ -241,7 +241,7 @@ export default function OrdersPage() {
 															<div>
 																<div className="text-sm text-gray-500 mb-1">Order ID</div>
 																<div className="font-semibold text-base">
-																	{order.razorpayOrderId || order.id}
+																	{order.cashfreeOrderId || order.id}
 																</div>
 															</div>
 															<div>

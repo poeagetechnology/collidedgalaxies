@@ -23,7 +23,7 @@ interface TrackOrderModalProps {
   onClose: () => void;
   order: {
     id: string;
-    razorpayOrderId?: string;
+    cashfreeOrderId?: string;
     createdAt: any;
     amount: number;
     status?: string;
@@ -113,7 +113,7 @@ const TrackOrderModal: React.FC<TrackOrderModalProps> = ({ isOpen, onClose, orde
             <div className="bg-gray-50 p-4 space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm font-semibold text-gray-600">Order ID:</span>
-                <span className="text-sm font-medium">{order.razorpayOrderId || order.id}</span>
+                <span className="text-sm font-medium">{order.cashfreeOrderId || order.id}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm font-semibold text-gray-600">Order Date:</span>
@@ -218,7 +218,7 @@ const TrackOrderModal: React.FC<TrackOrderModalProps> = ({ isOpen, onClose, orde
                     >
                       {/* Product Image */}
                       {item.image && (
-                        <div className="w-20 h-24 flex-shrink-0 relative bg-white">
+                        <div className="w-20 h-24 shrink-0 relative bg-white">
                           <Image
                             src={item.image}
                             alt={item.title || item.name || item.productTitle || 'Product'}

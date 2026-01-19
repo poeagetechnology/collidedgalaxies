@@ -37,10 +37,10 @@ export function OrderDetailsModal({
 
   if (!order) return null;
 
-  // 🔥 Correct ID selector (online = Razorpay ID, COD = Firestore Doc ID)
+  // 🔥 Correct ID selector (online = Cashfree ID, COD = Firestore Doc ID)
   const isOnline = order.paymentMode?.toLowerCase().includes("online");
   const realOrderId = isOnline
-    ? order.razorpayOrderId
+    ? order.cashfreeOrderId
     : order.firestoreDocId;
 
   const handleUpdatePaymentStatus = async () => {
@@ -217,7 +217,7 @@ export function OrderDetailsModal({
                       <td className="px-4 py-3 text-sm">
                         <div className="flex items-center gap-3">
                           {item.image && (
-                            <div className="w-24 h-32 flex-shrink-0 relative bg-gray-100">
+                            <div className="w-24 h-32 shrink-0 relative bg-gray-100">
                               <Image
                                 src={item.image}
                                 alt={item.title}

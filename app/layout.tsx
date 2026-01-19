@@ -118,9 +118,22 @@ export default function RootLayout({
           </CartProvider>
         </AuthProvider>
 
-        {/* Razorpay Checkout Script (REQUIRED) */}
+        {/* Shiprocket Checkout SDK */}
         <Script
-          src="https://checkout.razorpay.com/v1/checkout.js"
+          src="https://checkout-ui.shiprocket.com/assets/js/channels/shopify.js"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
+
+        {/* Shiprocket Checkout CSS */}
+        <link
+          rel="stylesheet"
+          href="https://checkout-ui.shiprocket.com/assets/styles/shopify.css"
+        />
+
+        {/* Cashfree Payment SDK */}
+        <Script
+          src="https://sdk.cashfree.com/js/v3/cashfree.js"
           strategy="afterInteractive"
         />
 

@@ -70,7 +70,7 @@ export default function Footer() {
               whileHover={{ scale: 1.2, rotate: 5 }}
               whileTap={{ scale: 0.9 }}
             >
-              <Link href="https://www.instagram.com/coga.in/" target="_blank" aria-label="Instagram" className="hover:opacity-80 transition">
+              <Link href="https://www.instagram.com/collidedgalaxies_com?utm_source=qr&igsh=eDM3NHZuaDFjczdm" target="_blank" aria-label="Instagram" className="hover:opacity-80 transition">
                 <Image
                   src="/instaIcon.svg"
                   alt="Instagram"
@@ -135,10 +135,10 @@ export default function Footer() {
                 2/224 Maruthinagar, Zuzuvadi,<br />Hosur, Tamil Nadu 635109
               </li>
               <li>
-                <Link href="tel:+919025865018" className="hover:text-white transition">+91 90258 65018</Link>
+                <Link href="tel:+919345373199" className="hover:text-white transition">+91 93453 73199</Link>
               </li>
               <li>
-                <Link href="mailto:collidedgalaxies.info@gmail.com" className="hover:text-white transition">collidedgalaxies.info@gmail.com</Link>
+                <Link href="mailto:info@collidedgalaxies.com" className="hover:text-white transition">info@collidedgalaxies.com</Link>
               </li>
             </ul>
           </div>

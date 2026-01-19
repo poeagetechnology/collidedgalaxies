@@ -107,7 +107,7 @@ export default function ContactUs() {
               Contact Us
             </motion.h1>
             <motion.p 
-              className="text-base md:text-lg text-gray-700 text-center md:w-[250px] md:text-right"
+              className="text-base md:text-lg text-gray-700 text-center md:w-62.5 md:text-right"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -120,7 +120,7 @@ export default function ContactUs() {
           <div className="w-full flex flex-col justify-between md:flex-row gap-12 md:gap-14 py-12 items-center">
             {/* Form Column */}
             <motion.div 
-              className="p-6 shadow-lg border-1 border-gray-200 rounded-none w-full max-w-none lg:max-w-[600px]"
+              className="p-6 shadow-lg border border-gray-200 rounded-none w-full max-w-none lg:max-w-150"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -259,10 +259,10 @@ export default function ContactUs() {
             </motion.div>
 
             {/* Info Column */}
-            <div className="flex-[2] max-w-[450px] w-full space-y-16 p-6 items-center">
+            <div className="flex-2 max-w-112.5 w-full space-y-16 p-6 items-center">
               {/* Email */}
               <div className="flex items-start gap-8">
-                <div className="bg-[#1A1A1A] rounded-xl p-3 flex-shrink-0 flex items-center justify-center">
+                <div className="bg-[#1A1A1A] rounded-xl p-3 shrink-0 flex items-center justify-center">
                   <Image
                     src="/mailIcon.svg"
                     alt="Email"
@@ -274,15 +274,15 @@ export default function ContactUs() {
 
                 <div>
                   <h2 className="font-bold text-black text-xl mb-2">Email</h2>
-                  <Link href="mailto:collidedgalaxies.info@gmail.com" className="text-blue-600 hover:underline">
-                    collidedgalaxies.info@gmail.com
+                  <Link href="mailto:customercare@collidedgalaxies.com" className="text-blue-600 hover:underline">
+                    customercare@collidedgalaxies.com
                   </Link>
                 </div>
               </div>
 
               {/* Phone */}
               <div className="flex items-start gap-8">
-                <div className="bg-[#1A1A1A] rounded-xl p-3 flex-shrink-0 flex items-center justify-center">
+                <div className="bg-[#1A1A1A] rounded-xl p-3 shrink-0 flex items-center justify-center">
                   <Image
                     src="/phoneIcon.svg"
                     alt="Phone"
@@ -293,15 +293,15 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <h2 className="font-bold text-black text-xl mb-2">Phone</h2>
-                  <Link href="tel:+919025865018" className="text-blue-600 hover:underline">
-                    +91 90258 65018
+                  <Link href="tel:+919345373199" className="text-blue-600 hover:underline">
+                    +91 93453 73199
                   </Link>
                 </div>
               </div>
 
               {/* Address */}
               <div className="flex items-start gap-8">
-                <div className="bg-[#1A1A1A] rounded-xl p-3 flex-shrink-0 flex items-center justify-center">
+                <div className="bg-[#1A1A1A] rounded-xl p-3 shrink-0 flex items-center justify-center">
                   <Image
                     src="/locationIcon.svg"
                     alt="Address"

@@ -13,11 +13,12 @@ import AddressModal from "@/src/components/forms/addressModal";
 import { AddressFormData } from "@/src/server/models/address.model";
 import { collection, getDocs } from "firebase/firestore";
 import toast from "react-hot-toast";
+import ShiprocketCheckoutButton from "@/src/components/checkout/ShiprocketCheckoutButton";
 
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Cashfree?: any;
   }
 }
 
@@ -37,7 +38,7 @@ export default function Checkout() {
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [couponInput, setCouponInput] = useState("");
   const [currentTab, setCurrentTab] = useState<'information' | 'shipping' | 'payment'>('information');
-  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod' | 'shiprocket'>('shiprocket');
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [directBuyData, setDirectBuyData] = useState<any>(null);
   
@@ -361,7 +362,7 @@ export default function Checkout() {
       return;
     }
 
-    if (typeof window === "undefined" || !window.Razorpay) {
+    if (typeof window === "undefined" || !window.Cashfree) {
       alert("Payment system is loading... please wait 2 seconds and try again.");
       return;
     }
@@ -372,10 +373,15 @@ export default function Checkout() {
 
       console.log("[Checkout] Payment initiated with total:", currentTotal);
 
-      const orderRes = await fetch("/api/razorpay-order", {
+      const orderRes = await fetch("/api/cashfree-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: Number(currentTotal) }),
+        body: JSON.stringify({ 
+          amount: Number(currentTotal),
+          customerId: user.uid,
+          customerEmail: user.email,
+          customerPhone: selectedAddress?.mobileNumber || "9000000000"
+        }),
       });
 
       console.log("[Checkout] API Response status:", orderRes.status);
@@ -395,92 +401,46 @@ export default function Checkout() {
         return;
       }
 
-      const order = orderData;
+      // Build items array - use directBuyData if cart is empty
+      let orderItems = cartItems;
+      let totalProducts = cartItems.reduce((sum: number, it: any) => sum + (it.quantity || 0), 0);
 
-      if (!order || !order.id) {
-        console.error("Razorpay order error:", order);
-        alert("Unable to initialize payment. Invalid response from server.");
-        return;
+      if (cartItems.length === 0 && directBuyData) {
+        orderItems = [{
+          productId: directBuyData.productId,
+          title: directBuyData.productTitle,
+          price: directBuyData.price,
+          quantity: directBuyData.quantity,
+          size: directBuyData.size,
+          color: directBuyData.color
+        }];
+        totalProducts = directBuyData.quantity || 1;
       }
 
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: "INR",
-        name: "COGA",
-        description: "Order Payment",
-        order_id: order.id,
-
-        handler: async (response: {
-          razorpay_payment_id: string;
-          razorpay_order_id: string;
-          razorpay_signature: string;
-        }) => {
-          try {
-            // Build items array - use directBuyData if cart is empty
-            let orderItems = cartItems;
-            let totalProducts = cartItems.reduce((sum: number, it: any) => sum + (it.quantity || 0), 0);
-
-            if (cartItems.length === 0 && directBuyData) {
-              orderItems = [{
-                productId: directBuyData.productId,
-                title: directBuyData.productTitle,
-                price: directBuyData.price,
-                quantity: directBuyData.quantity,
-                size: directBuyData.size,
-                color: directBuyData.color
-              }];
-              totalProducts = directBuyData.quantity || 1;
-            }
-
-            const payload = {
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              order: {
-                userId: user.uid,
-                userEmail: user.email || null,
-                customerName: userName || user.email || null,
-                amount: currentTotal,
-                totalProducts,
-                items: orderItems,
-                address: selectedAddress,
-                paymentMode: 'online'
-              }
-            };
-
-            const verifyRes = await fetch('/api/verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-            });
-
-            const verifyJson = await verifyRes.json();
-            if (!verifyRes.ok || !verifyJson?.success) {
-              console.error('Server verification failed', verifyJson);
-              throw new Error(verifyJson?.error || 'Verification failed');
-            }
-
-            clearCart();
-            sessionStorage.removeItem('directBuyData');
-            window.location.href = "/success";
-          } catch (err) {
-            console.error('Error saving order to server:', err);
-            alert('Payment succeeded but saving order failed. Contact support.');
-          }
-        },
-
-        prefill: {
-          name: userName || user.email || "",
-          email: user.email || "",
-          contact: selectedAddress?.mobileNumber || "",
-        },
-
-        theme: { color: "#000000" },
+      // Store order details in session storage for use after payment
+      const orderPayload = {
+        userId: user.uid,
+        userEmail: user.email || null,
+        customerName: userName || user.email || null,
+        amount: currentTotal,
+        totalProducts,
+        items: orderItems,
+        address: selectedAddress,
+        paymentMode: 'online',
+        cashfreeOrderId: orderData.order_id,
+        cfPaymentSessionId: orderData.payment_session_id,
       };
+      
+      sessionStorage.setItem('pendingOrder', JSON.stringify(orderPayload));
+      sessionStorage.setItem('cashfreeOrderId', orderData.order_id);
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      // Redirect to Cashfree hosted checkout
+      if (orderData.payment_session_id) {
+        // Use Cashfree Redirect Flow
+        window.location.href = orderData.payment_session_id;
+      } else {
+        throw new Error('Invalid payment session');
+      }
     } catch (error) {
       console.error('Payment error:', error);
       alert('Error initiating payment. Please try again.');
@@ -878,10 +838,25 @@ export default function Checkout() {
                         <input
                           type="radio"
                           name="paymentMethod"
+                          value="shiprocket"
+                          checked={paymentMethod === 'shiprocket'}
+                          onChange={() => setPaymentMethod('shiprocket')}
+                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer shrink-0"
+                        />
+                        <div className="flex-1">
+                          <span className="text-sm font-medium block mb-1">Fast Checkout (Shiprocket)</span>
+                          <span className="text-xs text-gray-600">One-click checkout with UPI, Cards, BNPL, and COD</span>
+                        </div>
+                      </label>
+
+                      <label className="flex items-start gap-3 p-4 border-2 border-gray-300 cursor-pointer transition-all hover:border-gray-400">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
                           value="cod"
                           checked={paymentMethod === 'cod'}
                           onChange={() => setPaymentMethod('cod')}
-                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer flex-shrink-0"
+                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer shrink-0"
                         />
                         <div className="flex-1">
                           <span className="text-sm font-medium block mb-1">Cash on Delivery</span>
@@ -896,10 +871,10 @@ export default function Checkout() {
                           value="online"
                           checked={paymentMethod === 'online'}
                           onChange={() => setPaymentMethod('online')}
-                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer flex-shrink-0"
+                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer shrink-0"
                         />
                         <div className="flex-1">
-                          <span className="text-sm font-medium block mb-1">Online Payment</span>
+                          <span className="text-sm font-medium block mb-1">Online Payment (Cashfree)</span>
                           <span className="text-xs text-gray-600">UPI, Cards, Net Banking</span>
                         </div>
                       </label>
@@ -913,12 +888,27 @@ export default function Checkout() {
                       >
                         <span className="mr-2">←</span> Back
                       </button>
-                      {paymentMethod === 'online' ? (
+                      {paymentMethod === 'shiprocket' ? (
+                        <ShiprocketCheckoutButton
+                          cartItems={directBuyData && cartItems.length === 0 ? [{
+                            id: directBuyData.productId,
+                            title: directBuyData.productTitle,
+                            quantity: directBuyData.quantity || 1,
+                            price: directBuyData.price,
+                            size: directBuyData.size,
+                            image: directBuyData.image
+                          }] : cartItems}
+                          userEmail={user?.email || ''}
+                          userPhone={formData.phoneNumber || ''}
+                          className="flex-1 bg-black text-white py-3.5 cursor-pointer hover:bg-gray-900 transition-colors font-semibold text-base"
+                          children={`Checkout with Shiprocket (₹${total.toFixed(2)})`}
+                        />
+                      ) : paymentMethod === 'online' ? (
                         <button
                           onClick={handlePayment}
                           className="flex-1 bg-black text-white py-3.5 cursor-pointer hover:bg-gray-900 transition-colors font-semibold text-base"
                         >
-                          Pay ₹{total.toFixed(2)}
+                          Pay ₹{total.toFixed(2)} (Cashfree)
                         </button>
                       ) : (
                         <button
@@ -943,12 +933,12 @@ export default function Checkout() {
                 </div>
 
                 {/* Cart Items */}
-                <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto">
+                <div className="space-y-4 mb-6 max-h-100 overflow-y-auto">
                   {directBuyData && cartItems.length === 0 ? (
                     // Display direct buy item
                     <div className="border-b pb-4">
                       <div className="flex gap-4">
-                        <div className="w-16 h-20 bg-gray-200 flex-shrink-0 relative">
+                        <div className="w-16 h-20 bg-gray-200 shrink-0 relative">
                           {directBuyData.image && (
                             <Image
                               src={directBuyData.image}
@@ -974,7 +964,7 @@ export default function Checkout() {
                     cartItems.map((it, i) => (
                       <div key={`prod-${(it as any).uniqueKey || i}`} className="border-b pb-4">
                         <div className="flex gap-4">
-                          <div className="w-16 h-20 bg-gray-200 flex-shrink-0 relative">
+                          <div className="w-16 h-20 bg-gray-200 shrink-0 relative">
                             {it.image && (
                               <Image
                                 src={it.image}

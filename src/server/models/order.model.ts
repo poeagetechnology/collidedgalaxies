@@ -39,8 +39,9 @@ export interface Order {
   orderDate: Date;
   items: OrderItem[];
   shippingAddress: ShippingAddress;
-  razorpayOrderId?: string;
-  razorpaySignature?: string;
+  cashfreeOrderId?: string;
+  cashfreePaymentId?: string;
+  cashfreePaymentMethod?: string;
   userId?: string;
   firestoreDocId?: string;
 

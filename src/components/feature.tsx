@@ -31,7 +31,7 @@ export default function FeaturesBar() {
     },
     {
       title: "Secure Payments",
-      desc: "Secured by Razorpay",
+      desc: "Secured by Cashfree",
       icon: "/secureIcon.svg",
       width: 40,
       height: 40,

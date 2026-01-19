@@ -126,191 +126,378 @@ function VerticalFilterDropdown({
   if (!show) return null;
 
   return (
-    <div
-      ref={filterDropdownRef}
-      className="absolute left-0 top-full mt-2 z-30"
-      style={{ minWidth: 260 }}
-      onClick={e => e.stopPropagation()}
-    >
-      <div className="bg-white border shadow-xl py-2 text-gray-900 w-64">
-        {hasAnyFilters && (
-          <div className="px-5 pt-2 pb-4 border-b">
-            <button
-              onClick={clearAllFilters}
-              className="text-sm cursor-pointer text-red-600 hover:text-red-800 hover:underline font-medium"
-            >
-              Clear All
-            </button>
-          </div>
-        )}
-
-        <ul>
-          <li
-            className="px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
-            onClick={(e) => { e.stopPropagation(); clearAllFilters(); }}
-          >
-            All
-          </li>
-
-          <li>
-            <div
-              className="flex justify-between items-center px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
-              onClick={(e) => handleExpand("categories", e)}
-            >
-              <span>
-                Categories {selectedFilters.categories.length > 0 && (
-                  <span className="ml-1 text-xs">({selectedFilters.categories.length})</span>
-                )}
-              </span>
-              <Image
-                src={expanded === "categories" ? "/upIcon.svg" : "/downIcon.svg"}
-                alt="Toggle"
-                width={16}
-                height={16}
-                className="ml-2 inline-block"
-              />
+    <>
+      {/* Desktop Dropdown Version */}
+      <div
+        ref={filterDropdownRef}
+        className="absolute left-0 top-full mt-2 z-30 md:block hidden"
+        style={{ minWidth: 260 }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="bg-white border shadow-xl py-2 text-gray-900 w-64">
+          {hasAnyFilters && (
+            <div className="px-5 pt-2 pb-4 border-b">
+              <button
+                onClick={clearAllFilters}
+                className="text-sm cursor-pointer text-red-600 hover:text-red-800 hover:underline font-medium"
+              >
+                Clear All
+              </button>
             </div>
-            {expanded === "categories" && (
-              <div className="max-h-48 overflow-y-auto">
-                {categories.map((cat: any) => {
-                  const isChecked = selectedFilters.categories.includes(cat.name);
-                  return (
-                    <div
-                      key={cat.id || cat.name}
-                      className="px-7 py-2 text-base cursor-pointer hover:bg-gray-100 flex items-center"
-                      onClick={(e) => toggleCategory(cat.name, e)}
-                      onTouchEnd={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleCategory(cat.name, e as any);
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        checked={isChecked}
-                        readOnly
-                        className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
-                      />
-                      <span>{cat.name}</span>
-                    </div>
-                  );
-                })}
+          )}
+
+          <ul>
+            <li
+              className="px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
+              onClick={(e) => { e.stopPropagation(); clearAllFilters(); }}
+            >
+              All
+            </li>
+
+            <li>
+              <div
+                className="flex justify-between items-center px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
+                onClick={(e) => handleExpand("categories", e)}
+              >
+                <span>
+                  Categories {selectedFilters.categories.length > 0 && (
+                    <span className="ml-1 text-xs">({selectedFilters.categories.length})</span>
+                  )}
+                </span>
+                <Image
+                  src={expanded === "categories" ? "/upIcon.svg" : "/downIcon.svg"}
+                  alt="Toggle"
+                  width={16}
+                  height={16}
+                  className="ml-2 inline-block"
+                />
               </div>
-            )}
-          </li>
-
-          <li>
-            <div
-              className="flex justify-between items-center px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
-              onClick={(e) => handleExpand("sizes", e)}
-            >
-              <span>
-                Sizes {selectedFilters.sizes.length > 0 && (
-                  <span className="ml-1 text-xs">({selectedFilters.sizes.length})</span>
-                )}
-              </span>
-              <Image
-                src={expanded === "sizes" ? "/upIcon.svg" : "/downIcon.svg"}
-                alt="Toggle"
-                width={16}
-                height={16}
-                className="ml-2 inline-block"
-              />
-            </div>
-            {expanded === "sizes" && (
-              <div className="max-h-48 overflow-y-auto">
-                {allSizes.map((s) => {
-                  const isAvailable = availableSizes.includes(s);
-                  const isChecked = selectedFilters.sizes.includes(s);
-                  return (
-                    <div
-                      key={s}
-                      className={`px-7 py-2 text-base flex items-center ${isAvailable
-                        ? 'cursor-pointer hover:bg-gray-100'
-                        : 'cursor-not-allowed opacity-40'
-                        }`}
-                      onClick={(e) => {
-                        if (isAvailable) toggleSize(s, e);
-                      }}
-                      onTouchEnd={(e) => {
-                        if (isAvailable) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleSize(s, e as any);
-                        }
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        disabled={!isAvailable}
-                        readOnly
-                        className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
-                      />
-                      <span>{s}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </li>
-
-          <li>
-            <div
-              className="flex justify-between items-center px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
-              onClick={(e) => handleExpand("colours", e)}
-            >
-              <span>
-                Colour {selectedFilters.colors.length > 0 && (
-                  <span className="ml-1 text-xs">({selectedFilters.colors.length})</span>
-                )}
-              </span>
-              <Image
-                src={expanded === "colours" ? "/upIcon.svg" : "/downIcon.svg"}
-                alt="Toggle"
-                width={16}
-                height={16}
-                className="ml-2 inline-block"
-              />
-            </div>
-            {expanded === "colours" && (
-              <div className="max-h-48 overflow-y-auto">
-                {availableColors.length > 0 ? (
-                  availableColors.map((clr: ColorOption) => {
-                    const isChecked = selectedFilters.colors.includes(clr.code);
+              {expanded === "categories" && (
+                <div className="max-h-48 overflow-y-auto">
+                  {categories.map((cat: any) => {
+                    const isChecked = selectedFilters.categories.includes(cat.name);
                     return (
                       <div
-                        key={clr.code}
-                        className="flex items-center px-7 py-2 text-base cursor-pointer hover:bg-gray-100"
-                        onClick={(e) => toggleColor(clr.code, e)}
+                        key={cat.id || cat.name}
+                        className="px-7 py-2 text-base cursor-pointer hover:bg-gray-100 flex items-center"
+                        onClick={(e) => toggleCategory(cat.name, e)}
                         onTouchEnd={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          toggleColor(clr.code, e as any);
+                          toggleCategory(cat.name, e as any);
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          checked={isChecked}
+                          readOnly
+                          className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
+                        />
+                        <span>{cat.name}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </li>
+
+            <li>
+              <div
+                className="flex justify-between items-center px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
+                onClick={(e) => handleExpand("sizes", e)}
+              >
+                <span>
+                  Sizes {selectedFilters.sizes.length > 0 && (
+                    <span className="ml-1 text-xs">({selectedFilters.sizes.length})</span>
+                  )}
+                </span>
+                <Image
+                  src={expanded === "sizes" ? "/upIcon.svg" : "/downIcon.svg"}
+                  alt="Toggle"
+                  width={16}
+                  height={16}
+                  className="ml-2 inline-block"
+                />
+              </div>
+              {expanded === "sizes" && (
+                <div className="max-h-48 overflow-y-auto">
+                  {allSizes.map((s) => {
+                    const isAvailable = availableSizes.includes(s);
+                    const isChecked = selectedFilters.sizes.includes(s);
+                    return (
+                      <div
+                        key={s}
+                        className={`px-7 py-2 text-base flex items-center ${isAvailable
+                          ? 'cursor-pointer hover:bg-gray-100'
+                          : 'cursor-not-allowed opacity-40'
+                          }`}
+                        onClick={(e) => {
+                          if (isAvailable) toggleSize(s, e);
+                        }}
+                        onTouchEnd={(e) => {
+                          if (isAvailable) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleSize(s, e as any);
+                          }
                         }}
                       >
                         <input
                           type="checkbox"
                           checked={isChecked}
+                          disabled={!isAvailable}
                           readOnly
                           className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
                         />
-                        <span className="w-5 h-5 border mr-3" style={{ background: clr.code, borderColor: "#888" }} />
-                        <span>{clr.name}</span>
+                        <span>{s}</span>
                       </div>
                     );
-                  })
-                ) : (
-                  <div className="px-7 py-2 text-sm text-gray-500">
-                    No colors available
-                  </div>
-                )}
+                  })}
+                </div>
+              )}
+            </li>
+
+            <li>
+              <div
+                className="flex justify-between items-center px-5 py-2 text-base cursor-pointer hover:bg-gray-100"
+                onClick={(e) => handleExpand("colours", e)}
+              >
+                <span>
+                  Colour {selectedFilters.colors.length > 0 && (
+                    <span className="ml-1 text-xs">({selectedFilters.colors.length})</span>
+                  )}
+                </span>
+                <Image
+                  src={expanded === "colours" ? "/upIcon.svg" : "/downIcon.svg"}
+                  alt="Toggle"
+                  width={16}
+                  height={16}
+                  className="ml-2 inline-block"
+                />
+              </div>
+              {expanded === "colours" && (
+                <div className="max-h-48 overflow-y-auto">
+                  {availableColors.length > 0 ? (
+                    availableColors.map((clr: ColorOption) => {
+                      const isChecked = selectedFilters.colors.includes(clr.code);
+                      return (
+                        <div
+                          key={clr.code}
+                          className="flex items-center px-7 py-2 text-base cursor-pointer hover:bg-gray-100"
+                          onClick={(e) => toggleColor(clr.code, e)}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleColor(clr.code, e as any);
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            readOnly
+                            className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
+                          />
+                          <span className="w-5 h-5 border mr-3" style={{ background: clr.code, borderColor: "#888" }} />
+                          <span>{clr.name}</span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="px-7 py-2 text-sm text-gray-500">
+                      No colors available
+                    </div>
+                  )}
+                </div>
+              )}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Mobile Full-Width Version */}
+      {show && (
+        <div className="md:hidden w-full bg-white border-b">
+          <div className="space-y-2 py-3">
+            {hasAnyFilters && (
+              <div className="px-4 pb-2 border-b">
+                <button
+                  onClick={clearAllFilters}
+                  className="text-sm cursor-pointer text-red-600 hover:text-red-800 hover:underline font-medium"
+                >
+                  Clear All
+                </button>
               </div>
             )}
-          </li>
-        </ul>
-      </div>
-    </div>
+
+            <ul className="space-y-1">
+              <li
+                className="px-4 py-2 text-base cursor-pointer hover:bg-gray-50"
+                onClick={(e) => { e.stopPropagation(); clearAllFilters(); }}
+              >
+                All
+              </li>
+
+              <li>
+                <div
+                  className="flex justify-between items-center px-4 py-2 text-base cursor-pointer hover:bg-gray-50"
+                  onClick={(e) => handleExpand("categories", e)}
+                >
+                  <span>
+                    Categories {selectedFilters.categories.length > 0 && (
+                      <span className="ml-1 text-xs">({selectedFilters.categories.length})</span>
+                    )}
+                  </span>
+                  <Image
+                    src={expanded === "categories" ? "/upIcon.svg" : "/downIcon.svg"}
+                    alt="Toggle"
+                    width={16}
+                    height={16}
+                    className="ml-2 inline-block"
+                  />
+                </div>
+                {expanded === "categories" && (
+                  <div>
+                    {categories.map((cat: any) => {
+                      const isChecked = selectedFilters.categories.includes(cat.name);
+                      return (
+                        <div
+                          key={cat.id || cat.name}
+                          className="px-6 py-2 text-base cursor-pointer hover:bg-gray-50 flex items-center"
+                          onClick={(e) => toggleCategory(cat.name, e)}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleCategory(cat.name, e as any);
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            checked={isChecked}
+                            readOnly
+                            className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
+                          />
+                          <span>{cat.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </li>
+
+              <li>
+                <div
+                  className="flex justify-between items-center px-4 py-2 text-base cursor-pointer hover:bg-gray-50"
+                  onClick={(e) => handleExpand("sizes", e)}
+                >
+                  <span>
+                    Sizes {selectedFilters.sizes.length > 0 && (
+                      <span className="ml-1 text-xs">({selectedFilters.sizes.length})</span>
+                    )}
+                  </span>
+                  <Image
+                    src={expanded === "sizes" ? "/upIcon.svg" : "/downIcon.svg"}
+                    alt="Toggle"
+                    width={16}
+                    height={16}
+                    className="ml-2 inline-block"
+                  />
+                </div>
+                {expanded === "sizes" && (
+                  <div>
+                    {allSizes.map((s) => {
+                      const isAvailable = availableSizes.includes(s);
+                      const isChecked = selectedFilters.sizes.includes(s);
+                      return (
+                        <div
+                          key={s}
+                          className={`px-6 py-2 text-base flex items-center ${isAvailable
+                            ? 'cursor-pointer hover:bg-gray-50'
+                            : 'cursor-not-allowed opacity-40'
+                            }`}
+                          onClick={(e) => {
+                            if (isAvailable) toggleSize(s, e);
+                          }}
+                          onTouchEnd={(e) => {
+                            if (isAvailable) {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleSize(s, e as any);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            disabled={!isAvailable}
+                            readOnly
+                            className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
+                          />
+                          <span>{s}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </li>
+
+              <li>
+                <div
+                  className="flex justify-between items-center px-4 py-2 text-base cursor-pointer hover:bg-gray-50"
+                  onClick={(e) => handleExpand("colours", e)}
+                >
+                  <span>
+                    Colour {selectedFilters.colors.length > 0 && (
+                      <span className="ml-1 text-xs">({selectedFilters.colors.length})</span>
+                    )}
+                  </span>
+                  <Image
+                    src={expanded === "colours" ? "/upIcon.svg" : "/downIcon.svg"}
+                    alt="Toggle"
+                    width={16}
+                    height={16}
+                    className="ml-2 inline-block"
+                  />
+                </div>
+                {expanded === "colours" && (
+                  <div>
+                    {availableColors.length > 0 ? (
+                      availableColors.map((clr: ColorOption) => {
+                        const isChecked = selectedFilters.colors.includes(clr.code);
+                        return (
+                          <div
+                            key={clr.code}
+                            className="flex items-center px-6 py-2 text-base cursor-pointer hover:bg-gray-50"
+                            onClick={(e) => toggleColor(clr.code, e)}
+                            onTouchEnd={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleColor(clr.code, e as any);
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              readOnly
+                              className="mr-3 w-4 h-4 cursor-pointer pointer-events-none"
+                            />
+                            <span className="w-5 h-5 border mr-3" style={{ background: clr.code, borderColor: "#888" }} />
+                            <span>{clr.name}</span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="px-6 py-2 text-sm text-gray-500">
+                        No colors available
+                      </div>
+                    )}
+                  </div>
+                )}
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -640,7 +827,7 @@ function ProductsPageContent() {
               {getPageTitle()}
             </h1>
             {showDescription && (
-              <p className="text-base md:text-lg text-gray-700 text-center md:w-[250px] md:text-right">
+              <p className="text-base md:text-lg text-gray-700 text-center md:w-62.5 md:text-right">
                 Shop the latest styles picked just for you.
                 Stay ahead of the curve with our newest arrivals.
               </p>
@@ -649,7 +836,7 @@ function ProductsPageContent() {
 
           <div className="w-full flex md:gap-10 sticky top-15 bg-white z-50 py-2 md:static flex-col md:flex-row sm:justify-between sm:items-center">
             <input
-              className="border border-gray-400 px-4 py-2 text-base w-full md:w-[400px]"
+              className="border border-gray-400 px-4 py-2 text-base w-full md:w-100"
               placeholder="Search products..."
               type="text"
               value={searchTerm}
@@ -657,8 +844,23 @@ function ProductsPageContent() {
               suppressHydrationWarning
             />
 
+            {/* Mobile Filters - Below search bar on mobile, hidden on desktop */}
+            <div className="md:hidden w-full mt-4 border-t pt-4">
+              <VerticalFilterDropdown
+                show={true}
+                onClose={() => setShowFilterDropdown(false)}
+                categories={categories}
+                selectedFilters={selectedFilters}
+                setSelectedFilters={setSelectedFilters}
+                filterDropdownRef={filterDropdownRef}
+                availableColors={availableColors}
+                availableSizes={availableSizes}
+              />
+            </div>
+
             <div className="flex flex-row justify-between md:justify-end md:gap-12 items-center py-4 md:py-0 w-full md:w-auto">
-              <div className="relative" ref={filterDropdownRef}>
+              {/* Desktop Filter Button - Hidden on mobile */}
+              <div className="hidden md:block relative" ref={filterDropdownRef}>
                 <button
                   type="button"
                   className="flex items-center cursor-pointer space-x-2 text-gray-700 text-base hover:text-black"
@@ -785,7 +987,7 @@ function ProductsPageContent() {
                 >
                   <Link href={productUrl} className="group">
                     <motion.div
-                      className={`aspect-[3/4] relative w-full overflow-hidden bg-gray-100 
+                      className={`aspect-3/4 relative w-full overflow-hidden bg-gray-100 
     ${!loadedImages[product.id] ? 'pointer-events-none' : ''}`}
                       whileHover={{ y: -5 }}
                       transition={{ duration: 0.3 }}

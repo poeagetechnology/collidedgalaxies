@@ -37,8 +37,9 @@ export default function ProductsPageNew() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [minRating, setMinRating] = useState<number>(0);
-  const [expandedFilter, setExpandedFilter] = useState<string | null>('Size');
+  const [expandedFilter, setExpandedFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('newest');
+  const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
 
   const allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
   const allTags = ['Trending', 'New', 'Sale', 'Premium', 'Comfortable', 'Eco-friendly'];
@@ -170,9 +171,9 @@ export default function ProductsPageNew() {
       </div>
       
       <div className="flex min-h-screen bg-white overflow-hidden -mt-14 md:mt-0">
-        {/* Sidebar */}
+        {/* Sidebar - Hidden on mobile, visible on desktop */}
         <div
-          className={`fixed md:static inset-y-0 left-0 w-full max-w-xs sm:max-w-sm md:w-56 bg-white border-r border-gray-200 transform transition-transform duration-300 z-40 overflow-y-auto ${
+          className={`hidden md:block md:w-56 bg-white border-r border-gray-200 overflow-y-auto ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
           }`}
         >
@@ -419,7 +420,7 @@ export default function ProductsPageNew() {
               {/* Search Bar */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
                 <div className="flex-1 w-full sm:w-auto flex items-center border border-gray-300 px-3 sm:px-4 py-2">
-                  <Search size={18} className="text-gray-400 flex-shrink-0" />
+                  <Search size={18} className="text-gray-400 shrink-0" />
                   <input
                     type="text"
                     placeholder="Search"
@@ -453,7 +454,7 @@ export default function ProductsPageNew() {
             {/* Mobile Search Bar */}
             <div className="flex md:hidden px-2 sm:px-4 py-2 sm:py-3 gap-2">
               <div className="flex-1 flex items-center border border-gray-300 px-2 sm:px-3 py-2">
-                <Search size={16} className="text-gray-400 flex-shrink-0" />
+                <Search size={16} className="text-gray-400 shrink-0" />
                 <input
                   type="text"
                   placeholder="Search"
@@ -464,29 +465,113 @@ export default function ProductsPageNew() {
               </div>
             </div>
 
-            {/* Mobile Sort and View Options */}
-            <div className="flex md:hidden items-center justify-between px-4 py-3 gap-2 text-xs overflow-x-auto">
-              <button className="flex items-center gap-1 px-2 py-1 border border-gray-300 rounded whitespace-nowrap">
-                <span>SKU</span>
-                <ChevronDown size={14} />
-              </button>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="flex items-center gap-1 px-2 py-1 border border-gray-300 rounded text-xs appearance-none cursor-pointer bg-white"
-              >
-                <option value="newest">Newest</option>
-                <option value="price-low">Price Low</option>
-                <option value="price-high">Price High</option>
-              </select>
-              <button className="flex items-center gap-1 px-2 py-1 border border-gray-300 rounded whitespace-nowrap">
-                <span>COLLECTIONS</span>
-                <ChevronDown size={14} />
-              </button>
-              <button className="flex items-center gap-1 px-2 py-1 border border-gray-300 rounded whitespace-nowrap">
-                <span>SHIRTS</span>
-                <ChevronDown size={14} />
-              </button>
+            {/* Mobile Filters Section */}
+            <div className="md:hidden border-b border-gray-200 px-3 py-3">
+              <h3 className="text-sm font-semibold mb-3">Filters</h3>
+              
+              <div className="grid grid-cols-2 gap-2">
+                {/* Size Filter */}
+                <div className="border border-gray-300 rounded p-2">
+                  <button
+                    onClick={() => toggleFilter('Size')}
+                    className="w-full flex justify-between items-center font-medium hover:text-gray-600"
+                  >
+                    <span className="text-xs">Size</span>
+                    <ChevronDown
+                      size={12}
+                      className={`transform transition-transform ${
+                        expandedFilter === 'Size' ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {expandedFilter === 'Size' && (
+                    <div className="mt-2 grid grid-cols-3 gap-1">
+                      {allSizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => toggleSize(size)}
+                          className={`py-1 px-2 border text-xs font-medium transition ${
+                            selectedSizes.includes(size)
+                              ? 'bg-black text-white border-black'
+                              : 'border-gray-300 hover:border-black'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Colors Filter */}
+                <div className="border border-gray-300 rounded p-2">
+                  <button
+                    onClick={() => toggleFilter('Colors')}
+                    className="w-full flex justify-between items-center font-medium hover:text-gray-600"
+                  >
+                    <span className="text-xs">Colors</span>
+                    <ChevronDown
+                      size={12}
+                      className={`transform transition-transform ${
+                        expandedFilter === 'Colors' ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {expandedFilter === 'Colors' && (
+                    <div className="mt-2 grid grid-cols-3 gap-1">
+                      {getAvailableColors().slice(0, 6).map((color) => (
+                        <button
+                          key={color.hex}
+                          onClick={() => toggleColor(color.hex)}
+                          className={`w-6 h-6 rounded-full border-2 transition ${
+                            selectedColors.includes(color.hex)
+                              ? 'border-black'
+                              : 'border-gray-300'
+                          }`}
+                          style={{ backgroundColor: color.hex }}
+                          title={color.name}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Price Range Filter */}
+                <div className="border border-gray-300 rounded p-2">
+                  <button
+                    onClick={() => toggleFilter('PriceRange')}
+                    className="w-full flex justify-between items-center font-medium hover:text-gray-600"
+                  >
+                    <span className="text-xs">Price</span>
+                    <ChevronDown
+                      size={12}
+                      className={`transform transition-transform ${
+                        expandedFilter === 'PriceRange' ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {expandedFilter === 'PriceRange' && (
+                    <div className="mt-2 space-y-1">
+                      <div className="flex gap-1">
+                        <input
+                          type="number"
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                          placeholder="Min"
+                          className="w-full px-1 py-1 border border-gray-300 text-xs"
+                        />
+                        <input
+                          type="number"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                          placeholder="Max"
+                          className="w-full px-1 py-1 border border-gray-300 text-xs"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -502,14 +587,18 @@ export default function ProductsPageNew() {
                   // Create slug: just use ID as the slug (simplest and most reliable)
                   const productSlug = product.id;
                   return (
-                    <Link key={product.id} href={`/pdtDetails/${productSlug}`}>
-                      <div className="group cursor-pointer h-full">
-                        <div className="aspect-square bg-gray-100 overflow-hidden mb-2 sm:mb-3 relative">
+                    <div key={product.id} className="group cursor-pointer h-full flex flex-col">
+                      <Link href={`/pdtDetails/${productSlug}`}>
+                        <div 
+                          className="aspect-square bg-gray-100 overflow-hidden mb-2 sm:mb-3 relative"
+                          onMouseEnter={() => setHoveredProductId(product.id)}
+                          onMouseLeave={() => setHoveredProductId(null)}
+                        >
                           <Image
-                            src={product.image || '/placeholder.png'}
+                            src={hoveredProductId === product.id && product.images && product.images[1] ? product.images[1] : (product.image || '/placeholder.png')}
                             alt={product.title || 'Product'}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform"
+                            className="object-cover transition-transform duration-300"
                           />
                         </div>
                         <p className="text-xs text-gray-600 uppercase mb-0.5 line-clamp-1">{product.category}</p>
@@ -526,8 +615,16 @@ export default function ProductsPageNew() {
                           </p>
                         )}
                       </div>
+                      </Link>
+                      {/* Shiprocket Checkout Button */}
+                      <Link href={`/pdtDetails/${product.id}?checkout=shiprocket`}>
+                        <button
+                          className="mt-2 sm:mt-3 w-full bg-blue-600 text-white py-2 sm:py-2.5 text-xs sm:text-sm font-semibold hover:bg-blue-700 transition-colors rounded"
+                        >
+                          Ship with Shiprocket
+                        </button>
+                      </Link>
                     </div>
-                    </Link>
                   );
                 })
               )}

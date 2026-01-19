@@ -110,7 +110,7 @@ export async function getOrders(): Promise<Order[]> {
           paymentMode = 'cod';
         } else if (
           pm.includes('online') ||
-          pm.includes('razorpay') ||
+          pm.includes('cashfree') ||
           pm.includes('upi') ||
           pm.includes('card')
         ) {
@@ -118,7 +118,7 @@ export async function getOrders(): Promise<Order[]> {
         }
       } else {
         // fallback logic
-        if (data.razorpayOrderId || data.razorpayPaymentId) {
+        if (data.cashfreeOrderId || data.cashfreePaymentId) {
           paymentMode = 'online';
         } else {
           paymentMode = 'cod';
@@ -126,13 +126,13 @@ export async function getOrders(): Promise<Order[]> {
       }
 
       return {
-        id: data.razorpayOrderId || docSnapshot.id,
+        id: data.cashfreeOrderId || docSnapshot.id,
         customerName,
         customerEmail,
         totalPrice: data.amount || 0,
         totalProducts,
         paymentMode,
-        paymentId: data.razorpayPaymentId || '',
+        paymentId: data.cashfreePaymentId || '',
         status: data.status || 'pending',
         paymentStatus: data.paymentStatus || 'pending',   // <-- FIX
         orderDate: data.createdAt instanceof Timestamp
@@ -140,8 +140,9 @@ export async function getOrders(): Promise<Order[]> {
           : new Date(),
         items: data.items || [],
         shippingAddress,
-        razorpayOrderId: data.razorpayOrderId,
-        razorpaySignature: data.razorpaySignature,
+        cashfreeOrderId: data.cashfreeOrderId,
+        cashfreePaymentId: data.cashfreePaymentId,
+        cashfreePaymentMethod: data.cashfreePaymentMethod,
         userId: data.userId,
         firestoreDocId: docSnapshot.id,
       };
@@ -170,7 +171,7 @@ export async function updateOrderStatus(
 )
   : Promise<void> {
   try {
-    // First, find the Firestore document ID for this Razorpay order ID
+    // First, find the Firestore document ID for this Cashfree order ID
     const ordersRef = collection(db, 'orders');
     const querySnapshot = await getDocs(ordersRef);
 
@@ -206,19 +207,19 @@ export async function updateOrderStatus(
  * This function is kept for reference but should NOT be used
  */
 export async function updateOrderStatusDirect(
-  razorpayOrderId: string,
+  cashfreeOrderId: string,
   status: Order['status']
 ): Promise<void> {
   console.warn('⚠️ updateOrderStatusDirect is deprecated. Use updateOrderStatus() instead.');
 
   try {
-    // Find the document by razorpayOrderId
+    // Find the document by cashfreeOrderId
     const ordersRef = collection(db, 'orders');
     const querySnapshot = await getDocs(ordersRef);
 
     let orderDocId: string | null = null;
     querySnapshot.forEach((doc) => {
-      if (doc.data().razorpayOrderId === razorpayOrderId) {
+      if (doc.data().cashfreeOrderId === cashfreeOrderId) {
         orderDocId = doc.id;
       }
     });
@@ -239,12 +240,12 @@ export async function updateOrderStatusDirect(
 }
 
 /**
- * Get order by Razorpay Order ID from Firebase
+ * Get order by Cashfree Order ID from Firebase
  */
-export async function getOrderById(razorpayOrderId: string): Promise<Order | null> {
+export async function getOrderById(cashfreeOrderId: string): Promise<Order | null> {
   try {
     const orders = await getOrders();
-    return orders.find(order => order.id === razorpayOrderId) || null;
+    return orders.find(order => order.id === cashfreeOrderId) || null;
   } catch (error) {
     console.error('Error fetching order by ID:', error);
     throw new Error('Failed to fetch order from Firebase');

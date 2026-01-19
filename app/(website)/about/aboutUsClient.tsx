@@ -125,7 +125,7 @@ export default function AboutPage() {
                   transition={{ duration: 0.6 }}
                   viewport={{ once: false, margin: "-50px" }}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200">
                         <div className="absolute inset-0 opacity-30">
                             <Image
                                 src="/fabricTexture.png"
@@ -159,9 +159,10 @@ export default function AboutPage() {
                           transition={{ duration: 0.6, delay: 0.2 }}
                           viewport={{ once: false, margin: "-50px" }}
                         >
-                            At Collided Galaxies (COGA), we craft timeless, high-quality garments
-                            with thoughtful design and meticulous tailoring — delivering comfort,
-                            confidence, and elegance to every wearer.
+                            Collided Galaxies was born in March 2024 with a simple but powerful idea.
+                            Just like a galaxy exists because millions of stars and planets collide and coexist, our
+                            brand is built on connection. The owners, the customers, and the community all come
+                            together to form one shared universe.
                         </motion.p>
                     </motion.div>
                 </motion.section>
@@ -178,7 +179,7 @@ export default function AboutPage() {
 
                         {/* IMAGE LEFT - Image 1 */}
                         <motion.div 
-                          className="relative h-[400px] md:h-full mt-8 md:mt-0 overflow-hidden order-2 md:order-1"
+                          className="relative h-100 md:h-full mt-8 md:mt-0 overflow-hidden order-2 md:order-1"
                           initial={{ opacity: 0, x: -40 }}
                           whileInView={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.6 }}
@@ -212,7 +213,7 @@ export default function AboutPage() {
                               transition={{ duration: 0.5, delay: 0.1 }}
                               viewport={{ once: false, margin: "-50px" }}
                             >
-                                Who We Are
+                                The Collision Begins
                             </motion.h2>
 
                             <motion.p 
@@ -222,15 +223,18 @@ export default function AboutPage() {
                               transition={{ duration: 0.6, delay: 0.2 }}
                               viewport={{ once: false, margin: "-50px" }}
                             >
-                                Collided Galaxies (COGA) is a modern clothing brand built on
-                                three foundations — quality, detail, and timeless design.
-                                We believe true luxury comes from precision, comfort, and the
-                                confidence that flows from wearing something made with intention.
+                                Collided Galaxies isn't just streetwear. It's a reflection of human life.
+                                Every design is inspired by real emotions, real struggles, real thoughts, and the everyday
+                                moments people live through but rarely speak about. From mindset shifts to inner
+                                conflicts, our pieces translate feelings into visuals you can wear.
+                                <br /><br />
+                                This brand represents collisions. Between dreams and reality. Between who you are and who you're becoming.
+                                Between individuality and belonging. That's Collided Galaxies.
                             </motion.p>
 
                             {/* Image 2 */}
                             <motion.div 
-                              className="relative h-[150px] md:h-[300px] overflow-hidden"
+                              className="relative h-37.5 md:h-75 overflow-hidden"
                               initial={{ opacity: 0, scale: 0.9 }}
                               whileInView={{ opacity: 1, scale: 1 }}
                               transition={{ duration: 0.6, delay: 0.3 }}
@@ -271,14 +275,13 @@ export default function AboutPage() {
                 <section className="py-20 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-12">
-                            The Art of Timeless Craftsmanship
+                            Our First Voice Through Product
                         </h2>
 
                         <p className="text-gray-700 text-lg leading-relaxed mb-16 max-w-3xl">
-                            Every COGA garment begins with premium materials. Our craftsmen blend
-                            traditional tailoring techniques with modern design to create pieces
-                            that last. From fabric selection to finishing touches, each step is
-                            carefully executed to ensure durability, comfort, and a refined aesthetic.
+                            In Collided Galaxies, every design begins with a real human experience.
+                            Our first two drops are "Mindset" and "New to the City", both rooted in everyday
+                            emotions and life transitions that shape who we become.
                         </p>
 
                         {/* Image 3 - Scroll-animated */}
@@ -300,19 +303,32 @@ export default function AboutPage() {
                         </div>
 
                         <div className="text-right space-y-12 pt-12">
-                            <h3 className="text-4xl md:text-5xl font-light tracking-tight">
-                                Redefining Modern Luxury
-                            </h3>
+                            <div>
+                                <h3 className="text-2xl md:text-3xl font-light tracking-tight mb-4">
+                                    Mindset
+                                </h3>
+                                <p className="text-gray-700 text-lg leading-relaxed max-w-3xl ml-auto">
+                                    Captures the phase right after college. It reflects the chaos people face stepping into the real world. Love, uncertainty, job
+                                    pressure, distractions, bad habits, temptations, and personal struggles all collide at once.
+                                    This design represents the journey of navigating that noise and slowly building a strong,
+                                    stable mindset despite everything pulling you in different directions.
+                                </p>
+                            </div>
 
-                            <p className="text-gray-700 text-lg leading-relaxed italic">
-                                We don't chase trends — we create classics.
-                            </p>
+                            <div>
+                                <h3 className="text-2xl md:text-3xl font-light tracking-tight mb-4">
+                                    New to the City
+                                </h3>
+                                <p className="text-gray-700 text-lg leading-relaxed max-w-3xl ml-auto">
+                                    Tells a different story. It starts where comfort ends and uncertainty begins. New faces, new streets, fear mixed
+                                    with excitement, loneliness mixed with ambition. It reflects the courage it takes to step
+                                    into a new city, adapt, survive, and create a life of your own while embracing every
+                                    unexpected adventure along the way.
+                                </p>
+                            </div>
 
-                            <p className="text-gray-700 text-lg leading-relaxed max-w-3xl ml-auto">
-                                Our collections blend contemporary silhouettes with timeless
-                                aesthetics, ensuring every piece feels expressive yet versatile.
-                                Whether you're dressing for a statement moment or a simple day
-                                out, COGA pieces are made to elevate your individuality.
+                            <p className="text-gray-700 text-lg leading-relaxed italic max-w-3xl ml-auto">
+                                These designs aren't just graphics. They're moments. They're emotions. They're chapters from real lives, translated into streetwear.
                             </p>
                         </div>
                     </div>
@@ -324,7 +340,7 @@ export default function AboutPage() {
                         {/* Image 4 - Zoom-out effect */}
                         <div
                             ref={zoomImageRef}
-                            className="relative h-[400px] md:h-[700px] overflow-hidden mb-12"
+                            className="relative h-100 md:h-175 overflow-hidden mb-12"
                         >
                             {aboutImages[3] && (
                                 <Image
@@ -339,10 +355,10 @@ export default function AboutPage() {
 
                         <div className="text-center space-y-1 pt-12 px-4 sm:px-6 lg:px-8">
                             <p className="text-gray-800 text-xl md:text-2xl font-light">
-                                Experience the elegance of authenticity.
+                                That's the essence of Collided Galaxies.
                             </p>
-                            <p className="text-gray-900 text-xl md:text-2xl">
-                                <span className="font-semibold">COGA</span> — Crafted for Those Who Value the Finest.
+                            <p className="text-gray-900 text-sm md:text-base mt-4">
+                                <span className="font-semibold">COGA</span> — Where emotions become wearable art.
                             </p>
 
                             {/* POLICY LINKS */}

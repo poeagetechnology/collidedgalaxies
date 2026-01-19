@@ -27,8 +27,8 @@ export default function PrivacyPolicyPage() {
                     <p className="text-gray-700">
                         <span className="font-semibold">Have questions?</span> We're here to help.
                     </p>
-                    <a href="mailto:customerscare@collidedgalaxies.com" className="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium hover:underline">
-                        📧 customerscare@collidedgalaxies.com
+                    <a href="mailto:customercare@collidedgalaxies.com" className="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                        📧 customercare@collidedgalaxies.com
                     </a>
                 </div>
             </div>
@@ -337,8 +337,8 @@ export default function PrivacyPolicyPage() {
                     </div>
                     <div className="mt-8 ml-9">
                         <p className="text-gray-700 font-semibold mb-2">To exercise your rights, contact us:</p>
-                        <a href="mailto:customerscare@collidedgalaxies.com" className="inline-block text-blue-600 hover:text-blue-800 font-medium hover:underline">
-                            📧 customerscare@collidedgalaxies.com
+                        <a href="mailto:customercare@collidedgalaxies.com" className="inline-block text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                            📧 customercare@collidedgalaxies.com
                         </a>
                     </div>
                 </section>
@@ -395,8 +395,8 @@ export default function PrivacyPolicyPage() {
                         </div>
                         <div className="border-t border-gray-700 pt-4 mt-4">
                             <p className="text-gray-300 text-sm font-semibold mb-2">Contact Email</p>
-                            <a href="mailto:customerscare@collidedgalaxies.com" className="inline-block text-blue-300 hover:text-blue-200 font-medium hover:underline transition">
-                                📧 customerscare@collidedgalaxies.com
+                            <a href="mailto:customercare@collidedgalaxies.com" className="inline-block text-blue-300 hover:text-blue-200 font-medium hover:underline transition">
+                                📧 customercare@collidedgalaxies.com
                             </a>
                         </div>
                     </div>
