@@ -69,7 +69,7 @@ export default function PrivacyPolicyPage() {
                                 </li>
                                 <li className="text-gray-700 flex items-start gap-2">
                                     <span className="text-purple-600 font-bold mt-1">•</span>
-                                    <span>Billing and delivery address</span>
+                                    <span>Billing and delivery addresses</span>
                                 </li>
                             </ul>
                         </div>
