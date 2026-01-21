@@ -30,6 +30,19 @@ export default function PrivacyPolicyPage() {
                     <a href="mailto:customercare@collidedgalaxies.com" className="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium hover:underline">
                         📧 customercare@collidedgalaxies.com
                     </a>
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                        <p className="text-gray-700 mb-2">
+                            <span className="font-semibold">Connect with us:</span>
+                        </p>
+                        <div className="flex flex-col gap-2">
+                            <a href="https://www.instagram.com/collidedgalaxies_com?utm_source=qr&igsh=eDM3NHZuaDFjczdm" target="_blank" rel="noopener noreferrer" className="inline-block text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                                📱 Instagram: @collidedgalaxies_com
+                            </a>
+                            <a href="https://www.facebook.com/profile.php?id=61586938162432" target="_blank" rel="noopener noreferrer" className="inline-block text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                                👍 Facebook: Collided Galaxies
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -318,6 +318,44 @@ export default function ContactUs() {
                   </p>
                 </div>
               </div>
+
+              {/* Instagram */}
+              <div className="flex items-start gap-8">
+                <div className="bg-[#1A1A1A] rounded-xl p-3 shrink-0 flex items-center justify-center">
+                  <Image
+                    src="/instaIcon.svg"
+                    alt="Instagram"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <div>
+                  <h2 className="font-bold text-black text-xl mb-2">Follow Us</h2>
+                  <Link href="https://www.instagram.com/collidedgalaxies_com?utm_source=qr&igsh=eDM3NHZuaDFjczdm" target="_blank" className="text-blue-600 hover:underline">
+                    @collidedgalaxies_com
+                  </Link>
+                </div>
+              </div>
+
+              {/* Facebook */}
+              <div className="flex items-start gap-8">
+                <div className="bg-[#1A1A1A] rounded-xl p-3 shrink-0 flex items-center justify-center">
+                  <Image
+                    src="/facebookIcon.svg"
+                    alt="Facebook"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <div>
+                  <h2 className="font-bold text-black text-xl mb-2">Connect on Facebook</h2>
+                  <Link href="https://www.facebook.com/profile.php?id=61586938162432" target="_blank" className="text-blue-600 hover:underline">
+                    Collided Galaxies
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

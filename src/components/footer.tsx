@@ -38,15 +38,22 @@ export default function Footer() {
 
         {/* ✅ Left: Logo & Slogan */}
         <motion.div className="flex flex-col gap-3 sm:gap-4 md:gap-5 md:w-1/3 text-left" variants={itemVariants}>
-          <motion.h2 
-            className="text-2xl sm:text-3xl md:text-[3rem] tracking-wide leading-none"
+          <motion.div 
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: false, margin: "-50px" }}
           >
-            COGA
-          </motion.h2>
+            <Link href="/" className="inline-flex items-center">
+              <Image
+                src="/COGA_Favicon.svg"
+                alt="COGA Logo"
+                width={120}
+                height={120}
+                className="object-contain filter brightness-0 invert"
+              />
+            </Link>
+          </motion.div>
           <motion.p 
             className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed"
             initial={{ opacity: 0 }}
@@ -74,6 +81,20 @@ export default function Footer() {
                 <Image
                   src="/instaIcon.svg"
                   alt="Instagram"
+                  width={24}
+                  height={24}
+                  className="w-8 h-8"
+                />
+              </Link>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.2, rotate: 5 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Link href="https://www.facebook.com/profile.php?id=61586938162432" target="_blank" aria-label="Facebook" className="hover:opacity-80 transition">
+                <Image
+                  src="/facebookIcon.svg"
+                  alt="Facebook"
                   width={24}
                   height={24}
                   className="w-8 h-8"

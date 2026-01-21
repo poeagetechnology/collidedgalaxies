@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/firebase';
-import { Heart, ShoppingBag, Star } from 'lucide-react';
+import { Heart, ShoppingBag, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface RelatedProduct {
   id: string;
@@ -30,6 +30,21 @@ const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.o
 export default function RelatedProducts({ currentProductId, currentCategory }: RelatedProductsProps) {
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Get items per view based on screen size
+  const getItemsPerView = () => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 768) return 1;
+      if (window.innerWidth < 1024) return 2;
+      return 3;
+    }
+    return 3;
+  };
+
+  const [itemsPerView, setItemsPerView] = useState(3);
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
@@ -125,6 +140,52 @@ export default function RelatedProducts({ currentProductId, currentCategory }: R
     }
   }, [currentProductId, currentCategory]);
 
+  // Initialize items per view on mount
+  useEffect(() => {
+    setItemsPerView(getItemsPerView());
+    const handleResize = () => setItemsPerView(getItemsPerView());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (relatedProducts.length <= itemsPerView) return;
+
+    const startAutoScroll = () => {
+      autoScrollRef.current = setInterval(() => {
+        setCurrentIndex((prev) => {
+          const maxIndex = relatedProducts.length - itemsPerView;
+          return prev >= maxIndex ? 0 : prev + 1;
+        });
+      }, 4000); // Auto-scroll every 4 seconds
+    };
+
+    startAutoScroll();
+
+    return () => {
+      if (autoScrollRef.current) {
+        clearInterval(autoScrollRef.current);
+      }
+    };
+  }, [relatedProducts.length, itemsPerView]);
+
+  const handlePrev = () => {
+    if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    setCurrentIndex((prev) => {
+      const maxIndex = relatedProducts.length - itemsPerView;
+      return prev <= 0 ? maxIndex : prev - 1;
+    });
+  };
+
+  const handleNext = () => {
+    if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    setCurrentIndex((prev) => {
+      const maxIndex = relatedProducts.length - itemsPerView;
+      return prev >= maxIndex ? 0 : prev + 1;
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="w-full py-12 px-4 md:px-8">
@@ -153,69 +214,125 @@ export default function RelatedProducts({ currentProductId, currentCategory }: R
       <div className="max-w-6xl mx-auto">
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-black">You Might Also Like</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {relatedProducts.map((product) => {
-            const displayPrice = product.discountPriceFirst10Days || product.price || 0;
-            const productImage = product.image || product.images?.[0] || PLACEHOLDER_IMG;
+        {/* Carousel Container */}
+        <div className="relative w-full">
+          {/* Carousel */}
+          <div 
+            ref={carouselRef}
+            className="w-full overflow-hidden"
+          >
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{
+                transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+              }}
+            >
+              {relatedProducts.map((product) => {
+                const displayPrice = product.discountPriceFirst10Days || product.price || 0;
+                const productImage = product.image || product.images?.[0] || PLACEHOLDER_IMG;
 
-            return (
-              <Link key={product.id} href={`/pdtDetails/${product.slug || product.id}`}>
-                <div className="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer h-full flex flex-col">
-                  {/* Image Container */}
-                  <div className="relative w-full aspect-square bg-gray-200 overflow-hidden">
-                    <Image
-                      src={productImage}
-                      alt={product.title}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                    <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors">
-                      <Heart size={18} className="text-red-600" />
-                    </button>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-semibold text-sm md:text-base line-clamp-2 mb-2 text-black">
-                        {product.title}
-                      </h3>
-
-                      {/* Rating */}
-                      {(product.reviewCount ?? 0) > 0 && (
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="flex items-center gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={14}
-                                className={i < Math.round(product.rating ?? 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-gray-600">({product.reviewCount ?? 0})</span>
+                return (
+                  <div
+                    key={product.id}
+                    className="shrink-0 px-3"
+                    style={{ width: `${100 / itemsPerView}%` }}
+                  >
+                    <Link href={`/pdtDetails/${product.slug || product.id}`}>
+                      <div className="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer h-full flex flex-col">
+                        {/* Image Container */}
+                        <div className="relative w-full aspect-square bg-gray-200 overflow-hidden">
+                          <Image
+                            src={productImage}
+                            alt={product.title}
+                            fill
+                            className="object-cover hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          />
+                          <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors">
+                            <Heart size={18} className="text-red-600" />
+                          </button>
                         </div>
-                      )}
-                    </div>
 
-                    {/* Price and Button */}
-                    <div>
-                      <div className="mb-3">
-                        <p className="font-bold text-lg md:text-xl text-black">
-                          ₹{(displayPrice ?? 0).toLocaleString()}
-                        </p>
+                        {/* Content */}
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <div>
+                            <h3 className="font-semibold text-sm md:text-base line-clamp-2 mb-2 text-black">
+                              {product.title}
+                            </h3>
+
+                            {/* Rating */}
+                            {(product.reviewCount ?? 0) > 0 && (
+                              <div className="flex items-center gap-2 mb-3">
+                                <div className="flex items-center gap-0.5">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      size={14}
+                                      className={i < Math.round(product.rating ?? 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="text-xs text-gray-600">({product.reviewCount ?? 0})</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Price and Button */}
+                          <div>
+                            <div className="mb-3">
+                              <p className="font-bold text-lg md:text-xl text-black">
+                                ₹{(displayPrice ?? 0).toLocaleString()}
+                              </p>
+                            </div>
+                            <button className="w-full bg-black text-white py-2 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-900 transition-colors text-sm">
+                              <ShoppingBag size={16} />
+                              Add to Cart
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <button className="w-full bg-black text-white py-2 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-900 transition-colors text-sm">
-                        <ShoppingBag size={16} />
-                        Add to Cart
-                      </button>
-                    </div>
+                    </Link>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Navigation Buttons */}
+          {relatedProducts.length > itemsPerView && (
+            <>
+              <button
+                onClick={handlePrev}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 bg-white shadow-lg rounded-full p-2 hover:bg-gray-100 transition-colors z-10"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft size={24} className="text-black" />
+              </button>
+              <button
+                onClick={handleNext}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 bg-white shadow-lg rounded-full p-2 hover:bg-gray-100 transition-colors z-10"
+                aria-label="Next slide"
+              >
+                <ChevronRight size={24} className="text-black" />
+              </button>
+            </>
+          )}
+
+          {/* Dot Indicators */}
+          {relatedProducts.length > itemsPerView && (
+            <div className="flex justify-center gap-2 mt-6">
+              {Array.from({ length: Math.ceil(relatedProducts.length - itemsPerView + 1) }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    idx === currentIndex ? 'bg-black w-8' : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

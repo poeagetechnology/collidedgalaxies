@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, Suspense } from 'react';
-import { Menu, X, User, LogOut, Settings, ListOrdered, ChevronDown, Heart } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, ListOrdered, ChevronDown, Heart, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import SignIn from '@/src/components/forms/signin';
@@ -11,9 +11,23 @@ import { useCategoryStorage } from '@/src/hooks/useCategoryStorage';
 import { toast } from 'react-hot-toast';
 import { fetchUserData, isUserAdmin } from '@/src/server/services/user.service';
 import AnnouncementBar from './announcement';
+import { db } from '@/firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+
+type Product = {
+  id: string;
+  title?: string;
+  slug?: string;
+  image?: string;
+  price?: string;
+};
 
 function NavbarContent() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [searchSuggestions, setSearchSuggestions] = useState<Product[]>([]);
   const { user, loading } = useAuth();
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -36,6 +50,34 @@ function NavbarContent() {
   const isCheckoutPage = pathname === '/checkout';
   const isAdmin = isUserAdmin(userRole);
   const showNavLinks = !isCheckoutPage;
+
+  // Load all products from Firebase
+  useEffect(() => {
+    const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const productsData: Product[] = [];
+      snapshot.forEach((doc) => {
+        productsData.push({ id: doc.id, ...doc.data() } as Product);
+      });
+      setAllProducts(productsData);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Filter products based on search query
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      const query = searchQuery.toLowerCase();
+      const filtered = allProducts
+        .filter(product => 
+          product.title?.toLowerCase().includes(query)
+        )
+        .slice(0, 6); // Limit to 6 suggestions
+      setSearchSuggestions(filtered);
+    } else {
+      setSearchSuggestions([]);
+    }
+  }, [searchQuery, allProducts]);
 
   useEffect(() => {
     if (user) {
@@ -187,6 +229,17 @@ function NavbarContent() {
                 <Link href="/admin"><button className="hidden md:flex text-sm cursor-pointer items-center justify-center px-2 py-2 bg-purple-600 text-white hover:bg-purple-700 transition-colors" title="Admin">Admin</button></Link>
               )}
 
+              {/* Global Search Icon */}
+              {!isCheckoutPage && (
+                <button 
+                  onClick={() => setIsSearchOpen(!isSearchOpen)} 
+                  className="cursor-pointer relative hover:opacity-70 transition"
+                  title="Search products"
+                >
+                  <Search size={22} className="text-gray-700" />
+                </button>
+              )}
+
               {!isCheckoutPage && (
                 <button onClick={toggleCart} className="cursor-pointer mt-1.25 relative">
                   <Image src="/cartIcon.svg" alt="Cart" width={25} height={25} />
@@ -229,6 +282,78 @@ function NavbarContent() {
         {/* Add AnnouncementBar here - inside the nav, at the bottom */}
         {pathname === "/" && (
           <AnnouncementBar />
+        )}
+
+        {/* Global Search Dropdown */}
+        {isSearchOpen && (
+          <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-md z-50">
+            <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3">
+              <div className="flex items-center gap-2 border border-gray-300 px-3 py-2 rounded">
+                <Search size={18} className="text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && searchQuery.trim()) {
+                      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                      setIsSearchOpen(false);
+                      setSearchQuery('');
+                    }
+                  }}
+                  autoFocus
+                  className="flex-1 outline-none text-sm"
+                />
+                <button 
+                  onClick={() => setIsSearchOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Search Suggestions */}
+              {searchQuery.trim().length > 0 && searchSuggestions.length > 0 && (
+                <div className="mt-2 border border-gray-200 rounded max-h-96 overflow-y-auto">
+                  {searchSuggestions.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => {
+                        router.push(`/pdtDetails/${product.slug || product.id}`);
+                        setIsSearchOpen(false);
+                        setSearchQuery('');
+                      }}
+                      className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-200 last:border-b-0 transition"
+                    >
+                      {product.image && (
+                        <Image
+                          src={product.image}
+                          alt={product.title || 'Product'}
+                          width={50}
+                          height={50}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                      )}
+                      <div className="flex-1 text-left">
+                        <p className="text-sm font-medium text-gray-900 truncate">{product.title}</p>
+                        {product.price && (
+                          <p className="text-xs text-gray-600">₹{product.price}</p>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* No results message */}
+              {searchQuery.trim().length > 0 && searchSuggestions.length === 0 && (
+                <div className="mt-2 p-3 text-center text-gray-600 text-sm">
+                  No products found
+                </div>
+              )}
+            </div>
+          </div>
         )}
 
       </nav>

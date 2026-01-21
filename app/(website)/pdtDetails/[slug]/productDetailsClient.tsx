@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useCart } from '@/src/context/CartContext';
 import { useAuth } from "@/src/context/authProvider";
@@ -12,7 +12,6 @@ import { db } from "@/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import RelatedProducts from "@/src/components/relatedProducts";
-import ProductReviewsSection from "@/src/components/productReviewsSection";
 import toast from "react-hot-toast";
 import { createShiprocketOrder, ShiprocketCustomer } from '@/src/utils/shiprocket-order.utils';
 
@@ -39,10 +38,34 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
   const [showMobileDetails, setShowMobileDetails] = useState(false);
   const [isDirectBuying, setIsDirectBuying] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const footerRef = useRef<HTMLDivElement>(null);
 
   // Set mounted state after hydration
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Handle scroll detection for sticky button
+  useEffect(() => {
+    const handleScroll = () => {
+      // Check if scrolled past initial threshold (100px)
+      const hasScrolledPast = window.scrollY > 100;
+      
+      // Check if footer is visible (approaching footer)
+      let isNearFooter = false;
+      if (footerRef.current) {
+        const footerPosition = footerRef.current.getBoundingClientRect().top;
+        // Hide button if footer is within 200px from bottom of viewport
+        isNearFooter = footerPosition < 200;
+      }
+      
+      // Show button only if scrolled past threshold AND not near footer
+      setHasScrolled(hasScrolledPast && !isNearFooter);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Initialize selected size and color
@@ -61,6 +84,37 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
     return !!(p?.sizes && p.sizes.length > 0);
   };
   const isOutOfStock = !hasAvailableSizes(product);
+
+  // Calculate discount percentage
+  const getDiscountPercentage = (): number | null => {
+    if (!product) return null;
+    
+    // Prioritize originalPrice if available
+    if (product?.originalPrice && product?.price) {
+      const originalPrice = Number(product.originalPrice);
+      const currentPrice = Number(product.price);
+      
+      if (!isNaN(originalPrice) && !isNaN(currentPrice) && originalPrice > currentPrice) {
+        const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+        return discountPercent > 0 ? discountPercent : null;
+      }
+    }
+    
+    // Check for discountPriceFirst10Days compared to regular price
+    if (product?.discountPriceFirst10Days && product?.price) {
+      const currentPrice = Number(product.price);
+      const discountPrice = Number(product.discountPriceFirst10Days);
+      
+      if (!isNaN(currentPrice) && !isNaN(discountPrice) && currentPrice > discountPrice) {
+        const discountPercent = Math.round(((currentPrice - discountPrice) / currentPrice) * 100);
+        return discountPercent > 0 ? discountPercent : null;
+      }
+    }
+    
+    return null;
+  };
+
+  const discountPercentage = getDiscountPercentage();
 
 
   const handleCloseSizeChart = () => {
@@ -459,14 +513,28 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
 
               <h1 className="text-3xl md:text-4xl font-bold mb-2">{product?.title}</h1>
 
-              {/* Price */}
-              <div className="flex items-center gap-4 mb-4">
+              {/* Price with Discount Badge */}
+              <div className="flex items-center gap-4 mb-4 flex-wrap">
                 <div className="text-2xl font-semibold">₹{product?.price ?? product?.discountPriceFirst10Days ?? '—'}</div>
+                {product?.originalPrice && product?.originalPrice !== product?.price && (
+                  <p className="text-lg line-through text-gray-500">₹{product.originalPrice}</p>
+                )}
+                {discountPercentage && (
+                  <div className="bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-bold">
+                    -{discountPercentage}%
+                  </div>
+                )}
               </div>
 
               <p className="text-gray-600 text-base leading-relaxed">
                 {product?.description ?? "No description available."}
               </p>
+
+              {/* Country of Production */}
+              <div className="mt-4 flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-700">Country of Production:</span>
+                <span className="text-sm text-gray-600">India</span>
+              </div>
             </div>
 
             {/* Size Selector */}
@@ -544,68 +612,69 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         </div>
 
         {/* Mobile: Fixed Bottom CTA */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 safe-area-inset-bottom z-50">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              {/* Quantity Controls for Mobile */}
-              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1.5">
+        {hasScrolled && (
+          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 safe-area-inset-bottom z-50 animate-slide-in-up">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                {/* Quantity Controls for Mobile */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1.5">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={isOutOfStock}
+                    className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span className="px-2.5 py-1 font-medium text-xs">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    disabled={isOutOfStock}
+                    className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
+                {/* Add to Cart Button */}
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={isOutOfStock}
-                  className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
+                  className="flex-1 bg-black text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
-                  <Minus size={14} />
+                  {isOutOfStock ? 'Out' : isAddingToCart ? 'Adding...' : 'ADD'}
                 </button>
-                <span className="px-2.5 py-1 font-medium text-xs">{quantity}</span>
+                {/* Buy Now Button */}
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  disabled={isOutOfStock}
-                  className="px-1.5 py-1 hover:bg-gray-200 rounded disabled:cursor-not-allowed"
+                  onClick={handleDirectBuy}
+                  disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
+                  className="flex-1 bg-orange-500 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
                 >
-                  <Plus size={14} />
+                  <Zap size={14} />
+                  {isOutOfStock ? 'Out' : isDirectBuying ? 'Wait...' : 'BUY'}
                 </button>
               </div>
-              {/* Add to Cart Button */}
+              {/* Shiprocket Button */}
               <button
-                onClick={handleAddToCart}
-                disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
-                className="flex-1 bg-black text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                onClick={handleShiprocketCheckout}
+                disabled={isOutOfStock || !selectedSize || !selectedColor}
+                className="w-full bg-blue-600 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                {isOutOfStock ? 'Out' : isAddingToCart ? 'Adding...' : 'ADD'}
-              </button>
-              {/* Buy Now Button */}
-              <button
-                onClick={handleDirectBuy}
-                disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
-                className="flex-1 bg-orange-500 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
-              >
-                <Zap size={14} />
-                {isOutOfStock ? 'Out' : isDirectBuying ? 'Wait...' : 'BUY'}
+                {isOutOfStock ? 'Out' : 'SHIPROCKET'}
               </button>
             </div>
-            {/* Shiprocket Button */}
-            <button
-              onClick={handleShiprocketCheckout}
-              disabled={isOutOfStock || !selectedSize || !selectedColor}
-              className="w-full bg-blue-600 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              {isOutOfStock ? 'Out' : 'SHIPROCKET'}
-            </button>
           </div>
-        </div>
+        )}
 
         {/* SignIn Modal */}
         <SignIn isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
-
-        {/* Product Reviews Section */}
-        <ProductReviewsSection productId={product.id} />
 
         {/* Related Products Section */}
         <RelatedProducts 
           currentProductId={product.id} 
           currentCategory={product.category}
         />
-        <Footer />
+        <div ref={footerRef}>
+          <Footer />
+        </div>
       </div>
     </>
   );

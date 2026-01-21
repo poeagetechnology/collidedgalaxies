@@ -151,6 +151,20 @@ export default function ProductsPageNew() {
     setExpandedFilter(expandedFilter === filterName ? null : filterName);
   };
 
+  // Calculate discount percentage
+  const getDiscountPercentage = (product: Product): number | null => {
+    if (!product?.originalPrice || !product?.price) return null;
+    
+    const originalPrice = Number(product.originalPrice);
+    const currentPrice = Number(product.price);
+    
+    if (isNaN(originalPrice) || isNaN(currentPrice)) return null;
+    if (originalPrice <= currentPrice) return null;
+    
+    const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    return discountPercent > 0 ? discountPercent : null;
+  };
+
   // Get unique colors from all products
   const getAvailableColors = (): Array<{ name: string; hex: string }> => {
     const colorMap = new Map<string, string>();
@@ -166,25 +180,206 @@ export default function ProductsPageNew() {
 
   return (
     <div className="w-full">
-      <div className="hidden md:block">
-        <Navbar />
+      <Navbar />
+      
+      {/* Mobile Search Bar */}
+      <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center border border-gray-300 px-3 py-2 rounded mb-3">
+          <Search size={16} className="text-gray-400 shrink-0" />
+          <input
+            type="text"
+            placeholder="Search products"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 ml-2 outline-none text-sm"
+          />
+        </div>
+        
+        {/* Filter Boxes Grid - Mobile with Inline Expansion */}
+        <div className="space-y-2">
+          {/* Size Filter Box */}
+          <div className="border border-gray-300 rounded overflow-hidden">
+            <div 
+              className="p-3 cursor-pointer hover:bg-gray-50 transition"
+              onClick={() => toggleFilter('Size')}>
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-semibold text-gray-700">Size</p>
+                <p className="text-xs text-gray-600">
+                  {selectedSizes.length > 0 ? `${selectedSizes.length} selected` : 'Choose'}
+                </p>
+              </div>
+            </div>
+            {expandedFilter === 'Size' && (
+              <div className="bg-gray-50 border-t border-gray-200 p-3 grid grid-cols-3 gap-2">
+                {allSizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => toggleSize(size)}
+                    className={`py-2 px-2 border text-xs font-medium transition ${
+                      selectedSizes.includes(size)
+                        ? 'bg-black text-white border-black'
+                        : 'border-gray-300 hover:border-black'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Color Filter Box */}
+          <div className="border border-gray-300 rounded overflow-hidden">
+            <div 
+              className="p-3 cursor-pointer hover:bg-gray-50 transition"
+              onClick={() => toggleFilter('Colors')}>
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-semibold text-gray-700">Color</p>
+                <p className="text-xs text-gray-600">
+                  {selectedColors.length > 0 ? `${selectedColors.length} selected` : 'Choose'}
+                </p>
+              </div>
+            </div>
+            {expandedFilter === 'Colors' && (
+              <div className="bg-gray-50 border-t border-gray-200 p-3 grid grid-cols-4 gap-2">
+                {getAvailableColors().map((color) => (
+                  <button
+                    key={color.hex}
+                    onClick={() => toggleColor(color.hex)}
+                    className={`py-2 px-2 border text-xs font-medium transition text-center ${
+                      selectedColors.includes(color.hex)
+                        ? 'bg-black text-white border-black'
+                        : 'border-gray-300 hover:border-black'
+                    }`}
+                    title={color.name}
+                  >
+                    <div 
+                      className="w-4 h-4 rounded-full mx-auto mb-1" 
+                      style={{ backgroundColor: color.hex }}
+                    />
+                    <span className="text-xs">{color.name.substring(0, 3)}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Price Filter Box */}
+          <div className="border border-gray-300 rounded overflow-hidden">
+            <div 
+              className="p-3 cursor-pointer hover:bg-gray-50 transition"
+              onClick={() => toggleFilter('Price')}>
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-semibold text-gray-700">Price</p>
+                <p className="text-xs text-gray-600">₹{priceRange[0]} - ₹{priceRange[1]}</p>
+              </div>
+            </div>
+            {expandedFilter === 'Price' && (
+              <div className="bg-gray-50 border-t border-gray-200 p-3 space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-700">Min: ₹{priceRange[0]}</label>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="50000" 
+                    value={priceRange[0]}
+                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-700">Max: ₹{priceRange[1]}</label>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="50000" 
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Availability Filter Box */}
+          <div className="border border-gray-300 rounded overflow-hidden">
+            <div 
+              className="p-3 cursor-pointer hover:bg-gray-50 transition"
+              onClick={() => toggleFilter('Availability')}>
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-semibold text-gray-700">Availability</p>
+                <p className="text-xs text-gray-600">In Stock</p>
+              </div>
+            </div>
+            {expandedFilter === 'Availability' && (
+              <div className="bg-gray-50 border-t border-gray-200 p-3">
+                <p className="text-xs text-gray-600">Only showing products in stock</p>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Clear Filters Button */}
+        {(selectedSizes.length > 0 || selectedColors.length > 0 || priceRange[0] !== 0 || priceRange[1] !== 10000 || selectedTags.length > 0) && (
+          <button 
+            onClick={() => {
+              setSelectedSizes([]);
+              setSelectedColors([]);
+              setPriceRange([0, 10000]);
+              setSelectedTags([]);
+              setMinRating(0);
+            }}
+            className="w-full mt-3 py-2 px-4 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded transition"
+          >
+            Clear Filters
+          </button>
+        )}
       </div>
       
-      <div className="flex min-h-screen bg-white overflow-hidden -mt-14 md:mt-0">
-        {/* Sidebar - Hidden on mobile, visible on desktop */}
+      {/* Desktop Filter Boxes - Hidden on all screens, only show on mobile via above section */}
+      <div className="hidden bg-white border-b border-gray-200 px-8 py-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+          {/* Size Filter Box */}
+          <div className="border border-gray-300 rounded p-3 cursor-pointer hover:border-black transition"
+            onClick={() => toggleFilter('Size')}>
+            <p className="text-xs font-semibold text-gray-700 mb-1">Size</p>
+            <p className="text-xs text-gray-600">
+              {selectedSizes.length > 0 ? `${selectedSizes.length} selected` : 'Choose size'}
+            </p>
+          </div>
+          
+          {/* Color Filter Box */}
+          <div className="border border-gray-300 rounded p-3 cursor-pointer hover:border-black transition"
+            onClick={() => toggleFilter('Colors')}>
+            <p className="text-xs font-semibold text-gray-700 mb-1">Color</p>
+            <p className="text-xs text-gray-600">
+              {selectedColors.length > 0 ? `${selectedColors.length} selected` : 'Choose color'}
+            </p>
+          </div>
+          
+          {/* Price Filter Box */}
+          <div className="border border-gray-300 rounded p-3 cursor-pointer hover:border-black transition"
+            onClick={() => toggleFilter('Price')}>
+            <p className="text-xs font-semibold text-gray-700 mb-1">Price</p>
+            <p className="text-xs text-gray-600">₹{priceRange[0]} - ₹{priceRange[1]}</p>
+          </div>
+          
+          {/* Availability Filter Box */}
+          <div className="border border-gray-300 rounded p-3 cursor-pointer hover:border-black transition"
+            onClick={() => toggleFilter('Availability')}>
+            <p className="text-xs font-semibold text-gray-700 mb-1">Availability</p>
+            <p className="text-xs text-gray-600">In Stock</p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex min-h-screen bg-white overflow-hidden md:mt-0">
+        {/* Sidebar - Hidden on mobile, visible on desktop only */}
         <div
-          className={`hidden md:block md:w-56 bg-white border-r border-gray-200 overflow-y-auto ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-          }`}
+          className={`hidden md:block md:w-56 bg-white border-r border-gray-200 overflow-y-auto z-40 h-screen md:h-auto`}
         >
         <div className="p-3 sm:p-4 md:p-3 h-screen overflow-y-auto">
-            {/* Close button for mobile */}
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="md:hidden absolute top-4 right-4 z-50"
-            >
-              <X size={24} />
-            </button>
 
             <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6">Filters</h3>
 
@@ -393,22 +588,6 @@ export default function ProductsPageNew() {
         <div className="flex-1 min-h-screen flex flex-col">
           {/* Top Header */}
           <div className="border-b border-gray-200 bg-white sticky md:top-0 top-0 z-30">
-            {/* Mobile Header */}
-            <div className="flex md:hidden items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-200">
-              <button onClick={() => setSidebarOpen(!sidebarOpen)}>
-                <Menu size={22} />
-              </button>
-              <Link href="/" className="text-lg sm:text-xl tracking-wide text-gray-900">COGA</Link>
-              <div className="flex gap-2 sm:gap-3">
-                <button>
-                  <Search size={18} />
-                </button>
-                <button>
-                  <ShoppingCart size={18} />
-                </button>
-              </div>
-            </div>
-
             {/* Desktop Header */}
             <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
               {/* Breadcrumb and Title */}
@@ -450,129 +629,6 @@ export default function ProductsPageNew() {
                 </div>
               </div>
             </div>
-
-            {/* Mobile Search Bar */}
-            <div className="flex md:hidden px-2 sm:px-4 py-2 sm:py-3 gap-2">
-              <div className="flex-1 flex items-center border border-gray-300 px-2 sm:px-3 py-2">
-                <Search size={16} className="text-gray-400 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 ml-2 outline-none text-xs sm:text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Mobile Filters Section */}
-            <div className="md:hidden border-b border-gray-200 px-3 py-3">
-              <h3 className="text-sm font-semibold mb-3">Filters</h3>
-              
-              <div className="grid grid-cols-2 gap-2">
-                {/* Size Filter */}
-                <div className="border border-gray-300 rounded p-2">
-                  <button
-                    onClick={() => toggleFilter('Size')}
-                    className="w-full flex justify-between items-center font-medium hover:text-gray-600"
-                  >
-                    <span className="text-xs">Size</span>
-                    <ChevronDown
-                      size={12}
-                      className={`transform transition-transform ${
-                        expandedFilter === 'Size' ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {expandedFilter === 'Size' && (
-                    <div className="mt-2 grid grid-cols-3 gap-1">
-                      {allSizes.map((size) => (
-                        <button
-                          key={size}
-                          onClick={() => toggleSize(size)}
-                          className={`py-1 px-2 border text-xs font-medium transition ${
-                            selectedSizes.includes(size)
-                              ? 'bg-black text-white border-black'
-                              : 'border-gray-300 hover:border-black'
-                          }`}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Colors Filter */}
-                <div className="border border-gray-300 rounded p-2">
-                  <button
-                    onClick={() => toggleFilter('Colors')}
-                    className="w-full flex justify-between items-center font-medium hover:text-gray-600"
-                  >
-                    <span className="text-xs">Colors</span>
-                    <ChevronDown
-                      size={12}
-                      className={`transform transition-transform ${
-                        expandedFilter === 'Colors' ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {expandedFilter === 'Colors' && (
-                    <div className="mt-2 grid grid-cols-3 gap-1">
-                      {getAvailableColors().slice(0, 6).map((color) => (
-                        <button
-                          key={color.hex}
-                          onClick={() => toggleColor(color.hex)}
-                          className={`w-6 h-6 rounded-full border-2 transition ${
-                            selectedColors.includes(color.hex)
-                              ? 'border-black'
-                              : 'border-gray-300'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.name}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Price Range Filter */}
-                <div className="border border-gray-300 rounded p-2">
-                  <button
-                    onClick={() => toggleFilter('PriceRange')}
-                    className="w-full flex justify-between items-center font-medium hover:text-gray-600"
-                  >
-                    <span className="text-xs">Price</span>
-                    <ChevronDown
-                      size={12}
-                      className={`transform transition-transform ${
-                        expandedFilter === 'PriceRange' ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {expandedFilter === 'PriceRange' && (
-                    <div className="mt-2 space-y-1">
-                      <div className="flex gap-1">
-                        <input
-                          type="number"
-                          value={priceRange[0]}
-                          onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                          placeholder="Min"
-                          className="w-full px-1 py-1 border border-gray-300 text-xs"
-                        />
-                        <input
-                          type="number"
-                          value={priceRange[1]}
-                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                          placeholder="Max"
-                          className="w-full px-1 py-1 border border-gray-300 text-xs"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Products Grid */}
@@ -601,6 +657,7 @@ export default function ProductsPageNew() {
                             className="object-cover transition-transform duration-300"
                           />
                         </div>
+                        
                         <p className="text-xs text-gray-600 uppercase mb-0.5 line-clamp-1">{product.category}</p>
                         <h3 className="font-medium text-gray-900 mb-1 sm:mb-2 line-clamp-2 text-xs sm:text-sm">
                           {product.title}
@@ -614,6 +671,11 @@ export default function ProductsPageNew() {
                             ₹{product.originalPrice}
                           </p>
                         )}
+                          {getDiscountPercentage(product) && (
+                            <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                              -{getDiscountPercentage(product)}%
+                            </div>
+                          )}
                       </div>
                       </Link>
                       {/* Shiprocket Checkout Button */}
