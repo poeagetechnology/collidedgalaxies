@@ -52,7 +52,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
       // Check if scrolled past initial threshold (100px)
       const hasScrolledPast = window.scrollY > 100;
       
-      // Check if footer is visible (approaching footer)
+      // Check if footer is was visible (approaching footer)
       let isNearFooter = false;
       if (footerRef.current) {
         const footerPosition = footerRef.current.getBoundingClientRect().top;
