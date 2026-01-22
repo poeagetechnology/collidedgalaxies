@@ -766,7 +766,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         {/* SignIn Modal */}
         <SignIn isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
 
-        {/* Shiprocket Headless Checkout Modal */}
+        {/* Shiprocket Headless Checkout Modals */}
         {showShiprocketCheckout && directBuyItem && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-9999 flex items-center justify-center p-2 sm:p-4">
             <div className="bg-white rounded-lg w-full max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col relative z-10000">
