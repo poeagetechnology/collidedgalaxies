@@ -3,6 +3,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { Menu, X, User, LogOut, Settings, ListOrdered, ChevronDown, Heart, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import './header.css';
 import SignIn from '@/src/components/forms/signin';
 import { useAuth, logout } from '@/src/context/authProvider';
 import { useCart } from '@/src/context/CartContext';
@@ -130,8 +131,11 @@ function NavbarContent() {
         <div className="w-full mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-14 sm:h-16">
 
-            {/* Left side - Logo and Navigation Dropdown */}
-            <div className="flex items-center gap-4">
+            {/* Left side - Hamburger and Logo */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Hamburger Menu */}
+              {showNavLinks && <button className="md:hidden p-1 text-gray-700 focus:outline-none" onClick={() => setIsOpen(true)}><Menu size={26} /></button>}
+
               {/* Logo */}
               <Link href="/" className="flex items-center">
                 <Image
@@ -241,10 +245,12 @@ function NavbarContent() {
               )}
 
               {!isCheckoutPage && (
-                <button onClick={toggleCart} className="cursor-pointer mt-1.25 relative">
+                <button onClick={toggleCart} className="cursor-pointer mt-1.25 relative group">
                   <Image src="/cartIcon.svg" alt="Cart" width={25} height={25} />
-                  {!loading && user && cartItemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-black text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">{cartItemCount > 99 ? '99+' : cartItemCount}</span>
+                  {!loading && cartItemCount > 0 && (
+                    <span className={`absolute -top-3 -right-3 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center cart-badge-blink shadow-lg border border-red-700`}>
+                      {cartItemCount > 99 ? '99+' : cartItemCount}
+                    </span>
                   )}
                 </button>
               )}
@@ -273,8 +279,6 @@ function NavbarContent() {
               ) : (
                 <button onClick={openSignInModal} className="hidden md:block text-white bg-black py-1.5 px-4 cursor-pointer hover:bg-gray-800 transition">Sign In</button>
               )}
-
-              {showNavLinks && <button className="md:hidden p-1 text-gray-700 focus:outline-none" onClick={() => setIsOpen(true)}><Menu size={26} /></button>}
             </div>
           </div>
         </div>

@@ -45,6 +45,11 @@ export const getCurrentPrice = (product: Product): string | undefined => {
   return diffDays < 10 ? product.discountPriceFirst10Days : product.discountPriceAfter10Days;
 };
 
+const isPlainProduct = (product: Product): boolean => {
+  return (product.title || "").toLowerCase().includes("plain") ||
+         (product.slug || "").toLowerCase().includes("plain");
+};
+
 export const subscribeToNewArrivals = (
   callback: (products: Product[]) => void,
   limitCount: number = 6
@@ -56,20 +61,27 @@ export const subscribeToNewArrivals = (
       ...(doc.data() as any),
     })) as Product[];
     
-    // Sort: non-plain products first, then plain products
-    items.sort((a, b) => {
-      const aIsPlain = (a.title || "").toLowerCase().includes("plain") ||
-                       (a.slug || "").toLowerCase().includes("plain");
-      const bIsPlain = (b.title || "").toLowerCase().includes("plain") ||
-                       (b.slug || "").toLowerCase().includes("plain");
-      
-      // Plain products come last
-      if (aIsPlain && !bIsPlain) return 1;
-      if (!aIsPlain && bIsPlain) return -1;
-      
-      // Both same type - maintain creation order
-      return 0;
-    });
+    // Filter out plain products
+    items = items.filter(item => !isPlainProduct(item));
+    
+    // Return only the requested limit
+    callback(items.slice(0, limitCount));
+  });
+};
+
+export const subscribeToPlainsArrivals = (
+  callback: (products: Product[]) => void,
+  limitCount: number = 6
+): Unsubscribe => {
+  const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(limitCount * 2));
+  return onSnapshot(q, (snapshot) => {
+    let items = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as any),
+    })) as Product[];
+    
+    // Filter to only plain products
+    items = items.filter(item => isPlainProduct(item));
     
     // Return only the requested limit
     callback(items.slice(0, limitCount));

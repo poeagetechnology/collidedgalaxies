@@ -12,7 +12,9 @@ import { db } from "@/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import RelatedProducts from "@/src/components/relatedProducts";
+import RecentlyViewed from "@/src/components/recentlyViewed";
 import toast from "react-hot-toast";
+import ShiprocketHeadlessCheckout from "@/src/components/checkout/ShiprocketHeadlessCheckout";
 import { createShiprocketOrder, ShiprocketCustomer } from '@/src/utils/shiprocket-order.utils';
 
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='800'%20height='800'%3E%3Crect%20fill='%23f3f4f6'%20width='100%25'%20height='100%25'/%3E%3Ctext%20x='50%25'%20y='50%25'%20dominant-baseline='middle'%20text-anchor='middle'%20fill='%23999'%20font-size='24'%3ENo%20image%3C/text%3E%3C/svg%3E";
@@ -37,14 +39,32 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showMobileDetails, setShowMobileDetails] = useState(false);
   const [isDirectBuying, setIsDirectBuying] = useState(false);
+  const [showShiprocketCheckout, setShowShiprocketCheckout] = useState(false);
+  const [directBuyItem, setDirectBuyItem] = useState<any>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<string | null>('description');
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const footerRef = useRef<HTMLDivElement>(null);
 
   // Set mounted state after hydration
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    
+    // Track recently viewed product
+    if (typeof window !== 'undefined' && product?.id) {
+      try {
+        const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+        // Remove product if already exists
+        const filtered = recentlyViewed.filter((id: string) => id !== product.id);
+        // Add current product to the beginning
+        const updated = [product.id, ...filtered].slice(0, 10); // Keep last 10 products
+        localStorage.setItem('recentlyViewed', JSON.stringify(updated));
+      } catch (error) {
+        console.error('Error tracking recently viewed:', error);
+      }
+    }
+  }, [product?.id]);
 
   // Handle scroll detection for sticky button
   useEffect(() => {
@@ -313,51 +333,30 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
       return;
     }
 
-    if (!user) {
-      setIsSignInOpen(true);
-      return;
-    }
-
-    setIsDirectBuying(true);
-
     try {
-      // Prepare customer data from Firebase
-      const userRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userRef);
-      const userData = userDoc.data() || {};
-
-      // Get default address or use provided data
-      const defaultAddress = userData.addresses?.[0] || {};
-
-      const customer: ShiprocketCustomer = {
-        name: userData.fullName || user.displayName || 'Customer',
-        email: user.email || '',
-        phone: userData.phone || '9999999999',
-        address: defaultAddress.address || 'Address not set',
-        city: defaultAddress.city || 'City',
-        state: defaultAddress.state || 'State',
-        pincode: defaultAddress.pincode || '000000',
-        country: 'India'
+      const selectedColorObj = typeof selectedColor === 'string' ? selectedColor : selectedColor;
+      const productImage = images?.[selectedImageIndex] || product?.image || PLACEHOLDER_IMG;
+      
+      // Prepare direct buy item for Shiprocket modal
+      const directBuyItem = {
+        id: product.id,
+        title: product.title,
+        price: product.price ?? product.discountPriceFirst10Days ?? 0,
+        quantity,
+        size: selectedSize,
+        color: selectedColorObj,
+        image: productImage,
       };
 
-      // Create order on Shiprocket
-      const result = await createShiprocketOrder(
-        {
-          id: product.id,
-          name: product.title,
-          price: product.price ?? product.discountPriceFirst10Days ?? 0,
-          quantity: quantity
-        },
-        customer,
-        'Default'
-      );
+      console.log('🛒 [Direct Buy] Opening Shiprocket checkout modal with product:', directBuyItem);
 
-      // Redirect to success page
-      window.location.href = `/success?order_id=${result.order_id}&payment_gateway=shiprocket`;
+      // Set the direct buy item and show Shiprocket modal
+      setDirectBuyItem(directBuyItem);
+      setShowShiprocketCheckout(true);
+      setIsDirectBuying(false);
     } catch (error) {
-      console.error('Shiprocket order error:', error);
-      toast.error('Failed to create order');
-    } finally {
+      console.error('❌ [Direct Buy] Error:', error);
+      toast.error('Failed to process direct buy. Please try again.');
       setIsDirectBuying(false);
     }
   };
@@ -421,192 +420,275 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 p-4 md:p-8 max-w-6xl mx-auto">
-          {/* Desktop: Image Gallery Section */}
-          <div className="hidden md:block">
-            {/* Main Image */}
-            <div className="relative w-full h-125 bg-gray-100 overflow-hidden mb-4">
-              <Image
-                src={images[selectedImageIndex] || PLACEHOLDER_IMG}
-                alt={product?.title || 'Product'}
-                fill
-                priority
-                className="object-cover"
-              />
-            </div>
-
-            {/* Thumbnail Grid */}
-            <div className="grid grid-cols-4 gap-3">
-              {images.map((img: string, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImageIndex(idx)}
-                  className={`relative w-full h-24 bg-gray-100 overflow-hidden cursor-pointer transition-all ${
-                    selectedImageIndex === idx ? 'ring-2 ring-black' : 'hover:opacity-70'
-                  }`}
-                >
-                  <Image
-                    src={img || PLACEHOLDER_IMG}
-                    alt={`thumb-${idx}`}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile: Image Carousel */}
-          <div className="md:hidden relative">
-            {/* Image Carousel */}
-            <div className="relative w-full h-96 bg-gray-100 overflow-hidden mb-4 rounded-lg">
-              <Image
-                src={images[selectedImageIndex] || PLACEHOLDER_IMG}
-                alt={product?.title || 'Product'}
-                fill
-                priority
-                className="object-cover"
-              />
-
-              {/* Navigation Buttons */}
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-colors"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
-                    onClick={() => setSelectedImageIndex((prev) => (prev + 1) % images.length)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-colors"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-
-                  {/* Dot Indicators */}
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
-                    {images.map((_: string, idx: number) => (
-                      <button
-                        key={idx}
-                        onClick={() => setSelectedImageIndex(idx)}
-                        className={`w-2 h-2 rounded-full transition-all ${
-                          idx === selectedImageIndex ? 'bg-black w-6' : 'bg-gray-400'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Product Details Section */}
-          <div className="flex flex-col">
-            {/* Product Info */}
-            <div className="mb-6">
-              {isOutOfStock && (
-                <div className="mb-3 inline-block bg-red-100 text-red-700 px-3 py-1 text-xs font-semibold">
-                  OUT OF STOCK
-                </div>
-              )}
-
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">{product?.title}</h1>
-
-              {/* Price with Discount Badge */}
-              <div className="flex items-center gap-4 mb-4 flex-wrap">
-                <div className="text-2xl font-semibold">₹{product?.price ?? product?.discountPriceFirst10Days ?? '—'}</div>
-                {product?.originalPrice && product?.originalPrice !== product?.price && (
-                  <p className="text-lg line-through text-gray-500">₹{product.originalPrice}</p>
-                )}
-                {discountPercentage && (
-                  <div className="bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-bold">
-                    -{discountPercentage}%
-                  </div>
-                )}
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+            {/* Desktop: Image Gallery Section */}
+            <div className="hidden md:block">
+              {/* Main Image */}
+              <div className="relative w-full h-125 bg-gray-100 overflow-hidden mb-4">
+                <Image
+                  src={images[selectedImageIndex] || PLACEHOLDER_IMG}
+                  alt={product?.title || 'Product'}
+                  fill
+                  priority
+                  className="object-cover"
+                />
               </div>
 
-              <p className="text-gray-600 text-base leading-relaxed">
-                {product?.description ?? "No description available."}
-              </p>
-
-              {/* Country of Production */}
-              <div className="mt-4 flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-700">Country of Production:</span>
-                <span className="text-sm text-gray-600">India</span>
+              {/* Thumbnail Grid */}
+              <div className="grid grid-cols-4 gap-3">
+                {images.map((img: string, idx: number) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImageIndex(idx)}
+                    className={`relative w-full h-24 bg-gray-100 overflow-hidden cursor-pointer transition-all ${
+                      selectedImageIndex === idx ? 'ring-2 ring-black' : 'hover:opacity-70'
+                    }`}
+                  >
+                    <Image
+                      src={img || PLACEHOLDER_IMG}
+                      alt={`thumb-${idx}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Size Selector */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold mb-3">Size</label>
-              <div className="grid grid-cols-4 gap-2">
-                {sizes.map((size) => {
-                  const available = product?.sizes ? product.sizes.includes(size) : true;
-                  return (
+            {/* Mobile: Image Carousel */}
+            <div className="md:hidden relative">
+              {/* Image Carousel */}
+              <div className="relative w-full h-96 bg-gray-100 overflow-hidden mb-4 rounded-lg">
+                <Image
+                  src={images[selectedImageIndex] || PLACEHOLDER_IMG}
+                  alt={product?.title || 'Product'}
+                  fill
+                  priority
+                  className="object-cover"
+                />
+
+                {/* Navigation Buttons */}
+                {images.length > 1 && (
+                  <>
                     <button
-                      key={size}
-                      onClick={() => available && setSelectedSize(size)}
-                      disabled={!available}
-                      className={`py-3 text-sm font-medium border-2 transition-all ${
-                        selectedSize === size && available
-                          ? 'bg-black text-white border-black'
-                          : available
-                          ? 'border-gray-300 text-gray-900 hover:border-gray-400'
-                          : 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
-                      }`}
+                      onClick={() => setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-colors"
                     >
-                      {size}
+                      <ChevronLeft size={20} />
                     </button>
-                  );
-                })}
+                    <button
+                      onClick={() => setSelectedImageIndex((prev) => (prev + 1) % images.length)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-colors"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+
+                    {/* Dot Indicators */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
+                      {images.map((_: string, idx: number) => (
+                        <button
+                          key={idx}
+                          onClick={() => setSelectedImageIndex(idx)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            idx === selectedImageIndex ? 'bg-black w-6' : 'bg-gray-400'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* Quantity and Add to Cart - Desktop */}
-            <div className="hidden md:flex flex-col gap-3">
-              <div className="flex gap-3">
-                <div className="flex items-center border border-gray-300">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={isOutOfStock}
-                    className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
-                  >
-                    <Minus size={18} />
-                  </button>
-                  <span className="px-4 py-2 font-medium">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    disabled={isOutOfStock}
-                    className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
-                  >
-                    <Plus size={18} />
-                  </button>
+            {/* Product Details Section */}
+            <div className="flex flex-col">
+              {/* Product Info */}
+              <div className="mb-6">
+                {isOutOfStock && (
+                  <div className="mb-3 inline-block bg-red-100 text-red-700 px-3 py-1 text-xs font-semibold">
+                    OUT OF STOCK
+                  </div>
+                )}
+
+                <h1 className="text-3xl md:text-4xl font-bold mb-2">{product?.title}</h1>
+
+                {/* Price with Discount Badge */}
+                <div className="flex items-center gap-4 mb-4 flex-wrap">
+                  <div className="text-2xl font-semibold">₹{product?.price ?? product?.discountPriceFirst10Days ?? '—'}</div>
+                  {product?.originalPrice && product?.originalPrice !== product?.price && (
+                    <p className="text-lg line-through text-gray-500">₹{product.originalPrice}</p>
+                  )}
+                  {discountPercentage && (
+                    <div className="bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-bold">
+                      SAVE {discountPercentage}%
+                    </div>
+                  )}
                 </div>
+
+              </div>
+
+              {/* Size Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold mb-3">Size</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {sizes.map((size) => {
+                    const available = product?.sizes ? product.sizes.includes(size) : true;
+                    return (
+                      <button
+                        key={size}
+                        onClick={() => available && setSelectedSize(size)}
+                        disabled={!available}
+                        className={`py-3 text-sm font-medium border-2 transition-all ${
+                          selectedSize === size && available
+                            ? 'bg-black text-white border-black'
+                            : available
+                            ? 'border-gray-300 text-gray-900 hover:border-gray-400'
+                            : 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Size Chart Link */}
                 <button
-                  onClick={handleAddToCart}
-                  disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
-                  className="flex-1 bg-black text-white py-3 font-semibold hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  onClick={() => setIsSizeChartOpen(true)}
+                  className="mt-4 text-sm text-blue-600 hover:text-blue-800 underline"
                 >
-                  {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD TO CART'}
-                </button>
-                <button
-                  onClick={handleDirectBuy}
-                  disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
-                  className="flex-1 bg-orange-500 text-white py-3 font-semibold hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-                >
-                  <Zap size={18} />
-                  {isOutOfStock ? 'Out of Stock' : isDirectBuying ? 'Processing...' : 'BUY NOW'}
+                  View Size Chart
                 </button>
               </div>
-              {/* Shiprocket Button */}
+
+              {/* Quantity and Add to Cart - Desktop */}
+              <div className="hidden md:flex flex-col gap-3">
+                {/* Row 1: Quantity and Add to Cart */}
+                <div className="flex gap-3">
+                  <div className="flex items-center border border-gray-300">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      disabled={isOutOfStock}
+                      className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
+                    >
+                      <Minus size={18} />
+                    </button>
+                    <span className="px-4 py-2 font-medium">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      disabled={isOutOfStock}
+                      className="px-3 py-2 hover:bg-gray-100 disabled:cursor-not-allowed"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
+                    className="flex-1 bg-black text-white py-3 font-semibold hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors uppercase"
+                  >
+                    {isOutOfStock ? 'Out of Stock' : isAddingToCart ? 'Adding...' : 'ADD TO CART'}
+                  </button>
+                </div>
+                {/* Row 2: Buy Button (Shiprocket) */}
+                <button
+                  onClick={handleShiprocketCheckout}
+                  disabled={isOutOfStock || !selectedSize || !selectedColor}
+                  className="w-full bg-blue-600 text-white py-3 font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors uppercase"
+                >
+                  {isOutOfStock ? 'Out of Stock' : 'BUY'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Information Accordion - Below Buttons */}
+          <div className="mt-12 border border-gray-300">
+            {/* Description Section */}
+            <div className="border-b border-gray-300">
               <button
-                onClick={handleShiprocketCheckout}
-                disabled={isOutOfStock || !selectedSize || !selectedColor}
-                className="w-full bg-blue-600 text-white py-3 font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                onClick={() => setExpandedSection(expandedSection === 'description' ? null : 'description')}
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
               >
-                {isOutOfStock ? 'Out of Stock' : 'SHIP WITH SHIPROCKET'}
+                <span className="text-lg font-semibold">Description</span>
+                <span className="text-2xl text-gray-600">
+                  {expandedSection === 'description' ? '−' : '+'}
+                </span>
               </button>
+              {expandedSection === 'description' && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-300">
+                  <p className="text-gray-700 leading-relaxed">
+                    {product?.description ?? "No description available."}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Shipping Policy Section */}
+            <div className="border-b border-gray-300">
+              <button
+                onClick={() => setExpandedSection(expandedSection === 'shipping' ? null : 'shipping')}
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+              >
+                <span className="text-lg font-semibold">Shipping Policy, Return & Exchange</span>
+                <span className="text-2xl text-gray-600">
+                  {expandedSection === 'shipping' ? '−' : '+'}
+                </span>
+              </button>
+              {expandedSection === 'shipping' && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-300">
+                  <div className="text-gray-700 space-y-3">
+                    <div>
+                      <p className="font-semibold mb-2">Shipping Policy:</p>
+                      <p>We offer fast and reliable shipping across India. Orders are dispatched within 2-3 business days. Standard delivery takes 5-7 business days, while express delivery is available for select locations.</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-2">Return & Exchange:</p>
+                      <p>We accept returns and exchanges within 7 days of delivery. Items must be in original condition with all tags attached. Please contact our support team to initiate a return or exchange.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Information Section */}
+            <div>
+              <button
+                onClick={() => setExpandedSection(expandedSection === 'information' ? null : 'information')}
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+              >
+                <span className="text-lg font-semibold">Information</span>
+                <span className="text-2xl text-gray-600">
+                  {expandedSection === 'information' ? '−' : '+'}
+                </span>
+              </button>
+              {expandedSection === 'information' && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-300">
+                  <div className="text-gray-700 space-y-2">
+                    <div className="flex gap-4">
+                      <span className="font-semibold min-w-max">SKU:</span>
+                      <span>{product?.sku ?? 'N/A'}</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <span className="font-semibold min-w-max">Category:</span>
+                      <span>{product?.category ?? 'N/A'}</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <span className="font-semibold min-w-max">Country of Production:</span>
+                      <span>India</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <span className="font-semibold min-w-max">Material:</span>
+                      <span>{product?.material ?? 'N/A'}</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <span className="font-semibold min-w-max">Care Instructions:</span>
+                      <span>{product?.careInstructions ?? 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -615,9 +697,10 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         {hasScrolled && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 safe-area-inset-bottom z-50 animate-slide-in-up">
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
+              {/* Row 1: Quantity and Add to Cart */}
+              <div className="flex items-stretch gap-2">
                 {/* Quantity Controls for Mobile */}
-                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1.5">
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1.5 border border-gray-300">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     disabled={isOutOfStock}
@@ -638,28 +721,44 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
                 <button
                   onClick={handleAddToCart}
                   disabled={isOutOfStock || isAddingToCart || !selectedSize || !selectedColor}
-                  className="flex-1 bg-black text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 bg-black text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors uppercase"
                 >
-                  {isOutOfStock ? 'Out' : isAddingToCart ? 'Adding...' : 'ADD'}
-                </button>
-                {/* Buy Now Button */}
-                <button
-                  onClick={handleDirectBuy}
-                  disabled={isOutOfStock || isDirectBuying || !selectedSize || !selectedColor}
-                  className="flex-1 bg-orange-500 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
-                >
-                  <Zap size={14} />
-                  {isOutOfStock ? 'Out' : isDirectBuying ? 'Wait...' : 'BUY'}
+                  {isOutOfStock ? 'Out' : isAddingToCart ? 'Adding...' : 'ADD TO CART'}
                 </button>
               </div>
-              {/* Shiprocket Button */}
+              {/* Row 2: Buy Button (Shiprocket) */}
               <button
                 onClick={handleShiprocketCheckout}
                 disabled={isOutOfStock || !selectedSize || !selectedColor}
-                className="w-full bg-blue-600 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-blue-600 text-white py-2.5 text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors uppercase"
               >
-                {isOutOfStock ? 'Out' : 'SHIPROCKET'}
+                {isOutOfStock ? 'Out of Stock' : 'BUY'}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Size Chart Modal */}
+        {isSizeChartOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white">
+                <h2 className="text-xl font-semibold">Size Chart</h2>
+                <button
+                  onClick={() => setIsSizeChartOpen(false)}
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="relative w-full h-96 p-4">
+                <Image
+                  src="/sizechart.jpg"
+                  alt="Size Chart"
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
           </div>
         )}
@@ -667,11 +766,56 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         {/* SignIn Modal */}
         <SignIn isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
 
+        {/* Shiprocket Headless Checkout Modal */}
+        {showShiprocketCheckout && directBuyItem && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-9999 flex items-center justify-center p-2 sm:p-4">
+            <div className="bg-white rounded-lg w-full max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col relative z-10000">
+              <button
+                onClick={() => {
+                  setShowShiprocketCheckout(false);
+                  setDirectBuyItem(null);
+                }}
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 bg-gray-200 hover:bg-gray-300 rounded-full p-2 transition"
+              >
+                <X size={24} />
+              </button>
+              <div className="overflow-y-auto flex-1 w-full">
+                <ShiprocketHeadlessCheckout
+                  cartItems={[directBuyItem]}
+                  onSuccess={() => {
+                    console.log('✅ Shiprocket checkout successful');
+                    toast.success('Order placed successfully!');
+                    setShowShiprocketCheckout(false);
+                    setDirectBuyItem(null);
+                    // Optionally redirect to success page after a delay
+                    setTimeout(() => {
+                      window.location.href = '/success';
+                    }, 1500);
+                  }}
+                  onError={(error) => {
+                    console.error('❌ Shiprocket checkout error:', error);
+                    toast.error('Payment failed. Please try again.');
+                  }}
+                  onCancel={() => {
+                    console.log('⭕ Shiprocket checkout cancelled');
+                    setShowShiprocketCheckout(false);
+                    setDirectBuyItem(null);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Related Products Section */}
         <RelatedProducts 
           currentProductId={product.id} 
           currentCategory={product.category}
         />
+        
+        {/* Recently Viewed Section */}
+        <RecentlyViewed currentProductId={product.id} />
+        
         <div ref={footerRef}>
           <Footer />
         </div>

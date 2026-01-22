@@ -673,7 +673,7 @@ export default function ProductsPageNew() {
                         )}
                           {getDiscountPercentage(product) && (
                             <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
-                              -{getDiscountPercentage(product)}%
+                              SAVE {getDiscountPercentage(product)}%
                             </div>
                           )}
                       </div>

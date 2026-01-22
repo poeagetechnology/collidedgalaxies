@@ -8,17 +8,14 @@ import Image from "next/image";
 import { useAuth, db } from "../../../src/context/authProvider";
 import { useCart } from "@/src/context/CartContext";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { Check } from "lucide-react";
 import AddressModal from "@/src/components/forms/addressModal";
 import { AddressFormData } from "@/src/server/models/address.model";
-import { collection, getDocs } from "firebase/firestore";
 import toast from "react-hot-toast";
-import ShiprocketCheckoutButton from "@/src/components/checkout/ShiprocketCheckoutButton";
-
+import ShiprocketHeadlessCheckout from "@/src/components/checkout/ShiprocketHeadlessCheckout";
 
 declare global {
   interface Window {
-    Cashfree?: any;
+    ShiprocketCheckout?: any;
   }
 }
 
@@ -31,14 +28,9 @@ export default function Checkout() {
   const [addresses, setAddresses] = useState<AddressFormData[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState<number | null>(null);
-  const [showPaymentSection, setShowPaymentSection] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
-  const [allCoupons, setAllCoupons] = useState<any[]>([]);
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
-  const [couponInput, setCouponInput] = useState("");
   const [currentTab, setCurrentTab] = useState<'information' | 'shipping' | 'payment'>('information');
-  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod' | 'shiprocket'>('shiprocket');
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [directBuyData, setDirectBuyData] = useState<any>(null);
   
@@ -70,54 +62,6 @@ export default function Checkout() {
     }
   }, []);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("appliedCoupon");
-    if (saved) setAppliedCoupon(JSON.parse(saved));
-  }, []);
-
-  useEffect(() => {
-    if (appliedCoupon) {
-      localStorage.setItem("appliedCoupon", JSON.stringify(appliedCoupon));
-    } else {
-      localStorage.removeItem("appliedCoupon");
-    }
-  }, [appliedCoupon]);
-
-  const cartCount = cartItems.length;
-
-  useEffect(() => {
-    const loadCoupons = async () => {
-      const couponsRef = collection(db, "media", "couponData", "coupons");
-      const snap = await getDocs(couponsRef);
-
-      const list: any[] = [];
-      snap.forEach((doc) => list.push({ id: doc.id, ...doc.data() }));
-      setAllCoupons(list);
-    };
-
-    loadCoupons();
-  }, []);
-
-  const handleApplyCoupon = () => {
-    if (!couponInput.trim()) {
-      toast.error("Enter a coupon code", { style: { borderRadius: 0 } });
-      return;
-    }
-
-    const match = allCoupons.find(
-      (c) => c.code === couponInput.trim()
-    );
-
-    if (!match) {
-      toast.error("Invalid coupon code", { style: { borderRadius: 0 } });
-      setAppliedCoupon(null);
-      return;
-    }
-
-    setAppliedCoupon(match);
-    toast.success(`Coupon applied: ${match.discount}% OFF`, { style: { borderRadius: 0 } });
-  };
-
   // Calculate subtotal from both cart items and direct buy data
   let subtotal = 0;
   let displayItems = cartItems;
@@ -135,13 +79,8 @@ export default function Checkout() {
   }
   
   const shipping = shippingMethod === 'express' ? 200 : 0;
-  // const tax = subtotal > 0 ? Math.round(subtotal * 0.02) : 0;
   const tax = 0;
-  const discountAmount = appliedCoupon
-    ? Math.round((subtotal * appliedCoupon.discount) / 100)
-    : 0;
-
-  const total = subtotal - discountAmount + shipping + tax;
+  const total = subtotal + shipping + tax;
 
   // Fetch user name from Firestore
   useEffect(() => {
@@ -331,206 +270,25 @@ export default function Checkout() {
     setCurrentTab('shipping');
   };
 
-  const handlePayment = async () => {
-    // ✅ ENHANCED VALIDATION
-    console.log('[Checkout Payment] Validation starting...');
-    console.log('[Checkout Payment] User:', user?.uid);
-    console.log('[Checkout Payment] Cart items:', cartItems.length);
-    console.log('[Checkout Payment] Direct buy data:', directBuyData);
-    console.log('[Checkout Payment] Addresses:', addresses);
-    console.log('[Checkout Payment] Selected index:', selectedAddressIndex);
+  const handleShiprocketSuccess = async (response: any) => {
+    console.log('✅ Shiprocket payment successful:', response);
+    clearCart();
+    sessionStorage.removeItem('directBuyData');
     
-    if (!user || !user.uid) {
-      alert("You must be logged in to place an order.");
-      window.location.href = "/";
-      return;
-    }
-
-    if (cartItems.length === 0 && !directBuyData) {
-      alert("Your cart is empty.");
-      return;
-    }
-
-    if (selectedAddressIndex === null || !addresses[selectedAddressIndex]) {
-      console.error('[Checkout Payment] Address validation failed:', {
-        selectedAddressIndex,
-        addressExists: selectedAddressIndex !== null ? !!addresses[selectedAddressIndex] : false,
-        allAddresses: addresses
-      });
-      alert("Please select a delivery address.");
-      setCurrentTab('information');
-      return;
-    }
-
-    if (typeof window === "undefined" || !window.Cashfree) {
-      alert("Payment system is loading... please wait 2 seconds and try again.");
-      return;
-    }
-
-    try {
-      const selectedAddress = addresses[selectedAddressIndex];
-      const currentTotal = subtotal - discountAmount + shipping + tax;
-
-      console.log("[Checkout] Payment initiated with total:", currentTotal);
-
-      const orderRes = await fetch("/api/cashfree-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          amount: Number(currentTotal),
-          customerId: user.uid,
-          customerEmail: user.email,
-          customerPhone: selectedAddress?.mobileNumber || "9000000000"
-        }),
-      });
-
-      console.log("[Checkout] API Response status:", orderRes.status);
-
-      const orderData = await orderRes.json();
-      
-      console.log("[Checkout] API Response data:", orderData);
-
-      if (!orderRes.ok) {
-        const errorMsg = orderData?.error || orderData?.message || 'Failed to create order';
-        console.error("Order API Error:", {
-          status: orderRes.status,
-          statusText: orderRes.statusText,
-          data: orderData
-        });
-        alert(`Payment error: ${errorMsg}`);
-        return;
-      }
-
-      // Build items array - use directBuyData if cart is empty
-      let orderItems = cartItems;
-      let totalProducts = cartItems.reduce((sum: number, it: any) => sum + (it.quantity || 0), 0);
-
-      if (cartItems.length === 0 && directBuyData) {
-        orderItems = [{
-          productId: directBuyData.productId,
-          title: directBuyData.productTitle,
-          price: directBuyData.price,
-          quantity: directBuyData.quantity,
-          size: directBuyData.size,
-          color: directBuyData.color
-        }];
-        totalProducts = directBuyData.quantity || 1;
-      }
-
-      // Store order details in session storage for use after payment
-      const orderPayload = {
-        userId: user.uid,
-        userEmail: user.email || null,
-        customerName: userName || user.email || null,
-        amount: currentTotal,
-        totalProducts,
-        items: orderItems,
-        address: selectedAddress,
-        paymentMode: 'online',
-        cashfreeOrderId: orderData.order_id,
-        cfPaymentSessionId: orderData.payment_session_id,
-      };
-      
-      sessionStorage.setItem('pendingOrder', JSON.stringify(orderPayload));
-      sessionStorage.setItem('cashfreeOrderId', orderData.order_id);
-
-      // Redirect to Cashfree hosted checkout
-      if (orderData.payment_session_id) {
-        // Use Cashfree Redirect Flow
-        window.location.href = orderData.payment_session_id;
-      } else {
-        throw new Error('Invalid payment session');
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert('Error initiating payment. Please try again.');
-    }
+    // Redirect to success page
+    window.location.href = "/success?payment_gateway=shiprocket&order_id=" + (response?.order_id || response?.orderId || 'success');
   };
 
-  const handleCODOrder = async () => {
-    // Validation
-    console.log('[Checkout COD] Validation starting...');
-    console.log('[Checkout COD] User:', user?.uid);
-    console.log('[Checkout COD] Cart items:', cartItems.length);
-    console.log('[Checkout COD] Direct buy data:', directBuyData);
-    console.log('[Checkout COD] Addresses:', addresses);
-    console.log('[Checkout COD] Selected index:', selectedAddressIndex);
-    
-    if (!user || !user.uid) {
-      alert("You must be logged in to place an order.");
-      window.location.href = "/";
-      return;
-    }
-
-    if (cartItems.length === 0 && !directBuyData) {
-      alert("Your cart is empty.");
-      return;
-    }
-
-    if (selectedAddressIndex === null || !addresses[selectedAddressIndex]) {
-      console.error('[Checkout COD] Address validation failed:', {
-        selectedAddressIndex,
-        addressExists: selectedAddressIndex !== null ? !!addresses[selectedAddressIndex] : false,
-        allAddresses: addresses
-      });
-      alert("Please select a delivery address.");
-      setCurrentTab('information');
-      return;
-    }
-
-    const selectedAddress = addresses[selectedAddressIndex];
-    
-    // Build items array - use directBuyData if cart is empty
-    let orderItems = cartItems;
-    let totalProducts = cartItems.reduce((sum: number, it: any) => sum + (it.quantity || 0), 0);
-
-    if (cartItems.length === 0 && directBuyData) {
-      orderItems = [{
-        productId: directBuyData.productId,
-        title: directBuyData.productTitle,
-        price: directBuyData.price,
-        quantity: directBuyData.quantity,
-        size: directBuyData.size,
-        color: directBuyData.color
-      }];
-      totalProducts = directBuyData.quantity || 1;
-    }
-
-    try {
-      const payload = {
-        order: {
-          userId: user.uid,
-          userEmail: user.email || null,
-          customerName: userName || user.email || null,
-          amount: total,
-          totalProducts,
-          items: orderItems,
-          address: selectedAddress,
-          paymentMode: 'cod',
-          paymentStatus: 'Pending'
-        }
-      };
-
-      const response = await fetch('/api/place-cod-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result?.success) {
-        throw new Error(result?.error || 'Failed to place order');
-      }
-
-      clearCart();
-      sessionStorage.removeItem('directBuyData');
-      window.location.href = "/success?payment=cod";
-    } catch (error) {
-      console.error('Error placing COD order:', error);
-      alert('Failed to place order. Please try again.');
-    }
+  const handleShiprocketError = (error: any) => {
+    console.error('❌ Shiprocket checkout error:', error);
+    toast.error('Checkout failed. Please try again.');
   };
+
+  const handleShiprocketCancel = () => {
+    console.log('User cancelled Shiprocket checkout');
+  };
+
+  const cartCount = cartItems.length;
 
   return (
     <>
@@ -833,91 +591,41 @@ export default function Checkout() {
                     )}
 
                     <h2 className="text-2xl font-bold mb-6">Payment Method</h2>
-                    <div className="space-y-3 mb-6">
-                      <label className="flex items-start gap-3 p-4 border-2 border-gray-300 cursor-pointer transition-all hover:border-gray-400">
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="shiprocket"
-                          checked={paymentMethod === 'shiprocket'}
-                          onChange={() => setPaymentMethod('shiprocket')}
-                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer shrink-0"
-                        />
-                        <div className="flex-1">
-                          <span className="text-sm font-medium block mb-1">Fast Checkout (Shiprocket)</span>
-                          <span className="text-xs text-gray-600">One-click checkout with UPI, Cards, BNPL, and COD</span>
-                        </div>
-                      </label>
-
-                      <label className="flex items-start gap-3 p-4 border-2 border-gray-300 cursor-pointer transition-all hover:border-gray-400">
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="cod"
-                          checked={paymentMethod === 'cod'}
-                          onChange={() => setPaymentMethod('cod')}
-                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer shrink-0"
-                        />
-                        <div className="flex-1">
-                          <span className="text-sm font-medium block mb-1">Cash on Delivery</span>
-                          <span className="text-xs text-gray-600">Pay when your order arrives</span>
-                        </div>
-                      </label>
-
-                      <label className="flex items-start gap-3 p-4 border-2 border-gray-300 cursor-pointer transition-all hover:border-gray-400">
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="online"
-                          checked={paymentMethod === 'online'}
-                          onChange={() => setPaymentMethod('online')}
-                          className="accent-black w-5 h-5 mt-0.5 cursor-pointer shrink-0"
-                        />
-                        <div className="flex-1">
-                          <span className="text-sm font-medium block mb-1">Online Payment (Cashfree)</span>
-                          <span className="text-xs text-gray-600">UPI, Cards, Net Banking</span>
-                        </div>
-                      </label>
-                    </div>
+                    <p className="text-sm text-gray-600 mb-6">
+                      Complete your payment securely with Shiprocket. All major payment methods accepted including UPI, Cards, and more.
+                    </p>
 
                     {/* Payment Button */}
                     <div className="flex gap-4">
-                      <button 
-                        onClick={handleBackToShipping} 
+                      <button
+                        onClick={handleBackToShipping}
                         className="flex items-center gap-2 text-sm font-bold border-2 border-black text-black hover:bg-gray-100 px-6 py-3 transition"
                       >
                         <span className="mr-2">←</span> Back
                       </button>
-                      {paymentMethod === 'shiprocket' ? (
-                        <ShiprocketCheckoutButton
-                          cartItems={directBuyData && cartItems.length === 0 ? [{
-                            id: directBuyData.productId,
-                            title: directBuyData.productTitle,
-                            quantity: directBuyData.quantity || 1,
-                            price: directBuyData.price,
-                            size: directBuyData.size,
-                            image: directBuyData.image
-                          }] : cartItems}
-                          userEmail={user?.email || ''}
-                          userPhone={formData.phoneNumber || ''}
-                          className="flex-1 bg-black text-white py-3.5 cursor-pointer hover:bg-gray-900 transition-colors font-semibold text-base"
-                          children={`Checkout with Shiprocket (₹${total.toFixed(2)})`}
-                        />
-                      ) : paymentMethod === 'online' ? (
-                        <button
-                          onClick={handlePayment}
-                          className="flex-1 bg-black text-white py-3.5 cursor-pointer hover:bg-gray-900 transition-colors font-semibold text-base"
-                        >
-                          Pay ₹{total.toFixed(2)} (Cashfree)
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleCODOrder}
-                          className="flex-1 bg-black text-white py-3.5 cursor-pointer hover:bg-gray-900 transition-colors font-semibold text-base"
-                        >
-                          Place Order (₹{total.toFixed(2)})
-                        </button>
-                      )}
+                      <ShiprocketHeadlessCheckout
+                        cartItems={directBuyData && cartItems.length === 0 ? [{
+                          id: directBuyData.productId,
+                          title: directBuyData.productTitle,
+                          quantity: directBuyData.quantity || 1,
+                          price: directBuyData.price,
+                          size: directBuyData.size,
+                          image: directBuyData.image
+                        }] : cartItems.map(item => ({
+                          id: String(item.id || ''),
+                          title: item.title || '',
+                          price: item.price || 0,
+                          quantity: item.quantity || 1,
+                          image: item.image,
+                          size: item.size,
+                          color: (item as any).color
+                        }))}
+                        onSuccess={handleShiprocketSuccess}
+                        onError={handleShiprocketError}
+                        onCancel={handleShiprocketCancel}
+                        className="flex-1 bg-black text-white py-3.5 cursor-pointer hover:bg-gray-900 transition-colors font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                        buttonText={`Pay ₹${total.toFixed(2)} with Shiprocket`}
+                      />
                     </div>
                   </>
                 )}

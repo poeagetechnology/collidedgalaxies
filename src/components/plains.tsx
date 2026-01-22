@@ -3,17 +3,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState, useRef } from 'react';
 import { Product } from '@/src/server/models/product.model';
-import { getProductUrl, getCurrentPrice, subscribeToNewArrivals } from '@/src/server/services/product.service';
+import { getProductUrl, getCurrentPrice, subscribeToPlainsArrivals } from '@/src/server/services/product.service';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export default function NewThisWeek() {
+export default function Plains() {
   const [products, setProducts] = useState<Product[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
   const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const unsub = subscribeToNewArrivals(setProducts, 8);
+    const unsub = subscribeToPlainsArrivals(setProducts, 8);
     return () => unsub();
   }, []);
 
@@ -81,9 +81,9 @@ export default function NewThisWeek() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold">
-            NEW
+            PLAINS
             <br />
-            THIS WEEK <span className="text-blue-600">({products.length})</span>
+            <span className="text-blue-600">({products.length})</span>
           </h2>
           <Link href="/products" className="text-gray-600 hover:text-gray-900 text-sm">
             See All
