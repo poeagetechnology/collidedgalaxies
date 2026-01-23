@@ -531,7 +531,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
               {/* Size Selector */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold mb-3">Size</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {sizes.map((size) => {
                     const available = product?.sizes ? product.sizes.includes(size) : true;
                     return (

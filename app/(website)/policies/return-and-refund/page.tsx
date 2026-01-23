@@ -11,10 +11,10 @@ export default function ReturnRefundPage() {
                 
                 {/* HEADER */}
                 <div className="flex flex-col md:flex-row justify-between items-center w-full py-6 mb-10">
-                    <h1 className="text-3xl md:text-4xl font-semibold text-center md:text-left md:w-[500px] leading-tight mb-2 md:mb-0">
+                    <h1 className="text-3xl md:text-4xl font-semibold text-center md:text-left md:w-125 leading-tight mb-2 md:mb-0">
                         Return & Refund Policy
                     </h1>
-                    <p className="text-base md:text-lg text-gray-700 text-center md:w-[350px] md:text-right">
+                    <p className="text-base md:text-lg text-gray-700 text-center md:w-87.5 md:text-right">
                         We accept returns and exchanges only for eligible cases to ensure a smooth and fair experience for our customers.
                     </p>
                 </div>

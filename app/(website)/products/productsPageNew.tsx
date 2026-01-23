@@ -196,7 +196,7 @@ export default function ProductsPageNew() {
         </div>
         
         {/* Filter Boxes Grid - Mobile with Inline Expansion */}
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
           {/* Size Filter Box */}
           <div className="border border-gray-300 rounded overflow-hidden">
             <div 
