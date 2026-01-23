@@ -15,6 +15,7 @@ interface ShiprocketCheckoutProps {
   }>;
   shiprocketToken?: string | null;
   shiprocketOrderId?: string | null;
+  sellerId?: string;
   onSuccess?: (response: any) => void;
   onCancel?: () => void;
   onError?: (error: any) => void;
@@ -32,6 +33,7 @@ export default function ShiprocketCheckoutProper({
   cartItems,
   shiprocketToken,
   shiprocketOrderId,
+  sellerId,
   onSuccess,
   onCancel,
   onError,
@@ -112,9 +114,13 @@ export default function ShiprocketCheckoutProper({
           console.error('[Shiprocket Checkout] SDK addToCart method not available');
           throw new Error('Shiprocket SDK not properly initialized. addToCart method not found.');
         }
-        window.HeadlessCheckout.addToCart(event, shiprocketToken, {
+        const options: any = {
           fallbackUrl: `${window.location.origin}/success?payment_gateway=shiprocket`
-        });
+        };
+        if (sellerId) {
+          options.sellerId = sellerId;
+        }
+        window.HeadlessCheckout.addToCart(event, shiprocketToken, options);
         onSuccess?.({
           token: shiprocketToken,
           order_id: shiprocketOrderId,
