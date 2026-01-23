@@ -11,7 +11,7 @@ import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firest
 import AddressModal from "@/src/components/forms/addressModal";
 import { AddressFormData } from "@/src/server/models/address.model";
 import toast from "react-hot-toast";
-import ShiprocketHeadlessCheckout from "@/src/components/checkout/ShiprocketHeadlessCheckout";
+import ShiprocketCheckoutProper from "@/src/components/checkout/ShiprocketCheckoutProper";
 
 declare global {
   interface Window {
@@ -603,7 +603,7 @@ export default function Checkout() {
                       >
                         <span className="mr-2">←</span> Back
                       </button>
-                      <ShiprocketHeadlessCheckout
+                      <ShiprocketCheckoutProper
                         cartItems={directBuyData && cartItems.length === 0 ? [{
                           id: directBuyData.productId,
                           title: directBuyData.productTitle,

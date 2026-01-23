@@ -17,8 +17,8 @@ export default function ContactInfo() {
         },
         {
             label: "Instagram DM:",
-            href: "https://www.instagram.com/coga.in/",
-            text: "@coga.in",
+            href: "https://www.instagram.com/collidedgalaxies_com",
+            text: "@collidedgalaxies_com",
             external: true,
         },
     ];
