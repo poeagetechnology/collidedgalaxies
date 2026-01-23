@@ -77,37 +77,26 @@ export async function GET(request: NextRequest) {
  * Creates variants for each size and color combination
  */
 function formatVariants(product: any) {
-  const variants = [];
-  const sizes = product.sizes || ['M'];
-  const colors = product.colors || [{ name: 'Default', hex: '#000000' }];
-
-  let variantId = 1;
-
-  for (const size of sizes) {
-    for (const color of colors) {
-      const colorName = typeof color === 'string' ? color : color.name;
-      
-      variants.push({
-        id: `${product.id}-${colorName}-${size}`.toLowerCase().replace(/\s+/g, '-'),
-        title: `${colorName} - ${size}`,
-        price: product.discountPriceFirst10Days || product.originalPrice || '0',
-        quantity: product.inventory?.[colorName]?.[size] || 100, // Default to 100 if not specified
-        sku: `${product.slug || product.id}-${colorName}-${size}`.toUpperCase().replace(/\s+/g, '-'),
-        updated_at: product.updatedAt ? new Date(product.updatedAt).toISOString() : new Date().toISOString(),
-        image: {
-          src: product.image || ''
-        },
-        weight: product.weight || 0.5
-      });
-
-      variantId++;
-    }
+  // Use the variants array from Firestore, if present
+  if (Array.isArray(product.variants) && product.variants.length > 0) {
+    return product.variants.map((variant: any) => ({
+      id: variant.numericId, // Use numericId for Shiprocket
+      title: variant.title || `${variant.color} - ${variant.size}`,
+      price: variant.price || product.discountPriceFirst10Days || product.originalPrice || '0',
+      quantity: typeof variant.stock === 'number' ? variant.stock : (variant.quantity || 100),
+      sku: variant.sku || `${product.slug || product.id}-${variant.color}-${variant.size}`.toUpperCase().replace(/\s+/g, '-'),
+      updated_at: product.updatedAt ? new Date(product.updatedAt).toISOString() : new Date().toISOString(),
+      image: {
+        src: variant.image || product.image || ''
+      },
+      weight: variant.weight || product.weight || 0.5
+    }));
   }
-
-  return variants.length > 0 ? variants : [
+  // Fallback to old logic if no variants array
+  return [
     {
-      id: `${product.id}-default`,
-      title: 'Default',
+      id: product.numericId || product.id,
+      title: product.title || 'Default',
       price: product.discountPriceFirst10Days || product.originalPrice || '0',
       quantity: 100,
       sku: `${product.slug || product.id}-default`.toUpperCase(),

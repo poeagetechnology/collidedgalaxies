@@ -14,7 +14,7 @@ import Link from "next/link";
 import RelatedProducts from "@/src/components/relatedProducts";
 import RecentlyViewed from "@/src/components/recentlyViewed";
 import toast from "react-hot-toast";
-import ShiprocketHeadlessCheckout from "@/src/components/checkout/ShiprocketHeadlessCheckout";
+import ShiprocketCheckoutProper from "@/src/components/checkout/ShiprocketCheckoutProper";
 import { createShiprocketOrder, ShiprocketCustomer } from '@/src/utils/shiprocket-order.utils';
 
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='800'%20height='800'%3E%3Crect%20fill='%23f3f4f6'%20width='100%25'%20height='100%25'/%3E%3Ctext%20x='50%25'%20y='50%25'%20dominant-baseline='middle'%20text-anchor='middle'%20fill='%23999'%20font-size='24'%3ENo%20image%3C/text%3E%3C/svg%3E";
@@ -41,6 +41,8 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
   const [isDirectBuying, setIsDirectBuying] = useState(false);
   const [showShiprocketCheckout, setShowShiprocketCheckout] = useState(false);
   const [directBuyItem, setDirectBuyItem] = useState<any>(null);
+  const [shiprocketToken, setShiprocketToken] = useState<string | null>(null);
+  const [shiprocketOrderId, setShiprocketOrderId] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>('description');
@@ -336,7 +338,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
     try {
       const selectedColorObj = typeof selectedColor === 'string' ? selectedColor : selectedColor;
       const productImage = images?.[selectedImageIndex] || product?.image || PLACEHOLDER_IMG;
-      
+
       // Prepare direct buy item for Shiprocket modal
       const directBuyItem = {
         id: product.id,
@@ -348,15 +350,44 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         image: productImage,
       };
 
-      console.log('🛒 [Direct Buy] Opening Shiprocket checkout modal with product:', directBuyItem);
+      // Prepare payload for Shiprocket token API
+      const formattedItems = [
+        {
+          variant_id: `${product.id}-${selectedColorObj || 'default'}-${selectedSize}`.toLowerCase().replace(/\s+/g, '-'),
+          quantity,
+        },
+      ];
+      const redirectUrl = `${window.location.origin}/success?payment_gateway=shiprocket`;
+      const timestamp = new Date().toISOString();
+      const requestPayload = {
+        cart_data: { items: formattedItems },
+        redirect_url: redirectUrl,
+        timestamp,
+      };
 
-      // Set the direct buy item and show Shiprocket modal
+      // Call backend to get Shiprocket token
+      const tokenResponse = await fetch('/api/shiprocket-access-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestPayload),
+      });
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        throw new Error(errorText || 'Failed to get Shiprocket token');
+      }
+      const tokenData = await tokenResponse.json();
+      if (!tokenData.token) {
+        throw new Error('No access token received from Shiprocket');
+      }
+
       setDirectBuyItem(directBuyItem);
+      setShiprocketToken(tokenData.token);
+      setShiprocketOrderId(tokenData.order_id || null);
       setShowShiprocketCheckout(true);
       setIsDirectBuying(false);
     } catch (error) {
-      console.error('❌ [Direct Buy] Error:', error);
-      toast.error('Failed to process direct buy. Please try again.');
+      console.error('❌ [Shiprocket Checkout] Error:', error);
+      toast.error('Failed to process Shiprocket checkout. Please try again.');
       setIsDirectBuying(false);
     }
   };
@@ -767,26 +798,32 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         <SignIn isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
 
         {/* Shiprocket Headless Checkout Modals */}
-        {showShiprocketCheckout && directBuyItem && (
+        {showShiprocketCheckout && directBuyItem && shiprocketToken && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-9999 flex items-center justify-center p-2 sm:p-4">
             <div className="bg-white rounded-lg w-full max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col relative z-10000">
               <button
                 onClick={() => {
                   setShowShiprocketCheckout(false);
                   setDirectBuyItem(null);
+                  setShiprocketToken(null);
+                  setShiprocketOrderId(null);
                 }}
                 className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 bg-gray-200 hover:bg-gray-300 rounded-full p-2 transition"
               >
                 <X size={24} />
               </button>
               <div className="overflow-y-auto flex-1 w-full">
-                <ShiprocketHeadlessCheckout
+                <ShiprocketCheckoutProper
                   cartItems={[directBuyItem]}
+                  shiprocketToken={shiprocketToken}
+                  shiprocketOrderId={shiprocketOrderId}
                   onSuccess={() => {
                     console.log('✅ Shiprocket checkout successful');
                     toast.success('Order placed successfully!');
                     setShowShiprocketCheckout(false);
                     setDirectBuyItem(null);
+                    setShiprocketToken(null);
+                    setShiprocketOrderId(null);
                     // Optionally redirect to success page after a delay
                     setTimeout(() => {
                       window.location.href = '/success';
@@ -800,6 +837,8 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
                     console.log('⭕ Shiprocket checkout cancelled');
                     setShowShiprocketCheckout(false);
                     setDirectBuyItem(null);
+                    setShiprocketToken(null);
+                    setShiprocketOrderId(null);
                   }}
                 />
               </div>

@@ -25,9 +25,16 @@ export async function POST(request: NextRequest) {
   try {
     console.log('🚀 [Shiprocket] Received token request');
     
+
     const apiKey = process.env.NEXT_PUBLIC_SHIPROCKET_API_KEY;
     const secretKey = process.env.SHIPROCKET_SECRET_KEY;
     const baseUrl = process.env.NEXT_PUBLIC_SHIPROCKET_BASE_URL || 'https://checkout-api.shiprocket.com';
+
+    // Log the actual values (partially masked for security)
+    console.log('🔑 [Shiprocket] ENV CHECK:');
+    console.log('  NEXT_PUBLIC_SHIPROCKET_API_KEY:', apiKey ? apiKey.substring(0, 6) + '...' : 'undefined');
+    console.log('  SHIPROCKET_SECRET_KEY:', secretKey ? secretKey.substring(0, 6) + '...' : 'undefined');
+    console.log('  NEXT_PUBLIC_SHIPROCKET_BASE_URL:', baseUrl);
 
     console.log('🔑 [Shiprocket] Credentials check:', {
       hasApiKey: !!apiKey,
@@ -58,9 +65,18 @@ export async function POST(request: NextRequest) {
     // Generate timestamp in ISO 8601 format (required by Shiprocket)
     const timestamp = new Date().toISOString();
 
+    // Sanitize variant_id in all cart items (remove #)
+    const sanitizedCartData = {
+      ...body.cart_data,
+      items: body.cart_data.items.map(item => ({
+        ...item,
+        variant_id: typeof item.variant_id === 'string' ? item.variant_id.replace(/#/g, '') : item.variant_id
+      }))
+    };
+
     // Prepare the payload - EXACT order matters for signature
     const payload = {
-      cart_data: body.cart_data,
+      cart_data: sanitizedCartData,
       redirect_url: body.redirect_url,
       timestamp: timestamp
     };

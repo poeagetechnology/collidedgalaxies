@@ -19,7 +19,6 @@ declare global {
   }
 }
 
-
 export default function Checkout() {
   const { cartItems, clearCart } = useCart();
   const { user, loading } = useAuth();
@@ -271,21 +270,51 @@ export default function Checkout() {
   };
 
   const handleShiprocketSuccess = async (response: any) => {
-    console.log('✅ Shiprocket payment successful:', response);
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('✅ [Checkout Page] SHIPROCKET SUCCESS');
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('Response:', JSON.stringify(response, null, 2));
+    console.log('Response keys:', Object.keys(response || {}));
+    
+    const orderId = response?.order_id || response?.orderId || 'success';
+    console.log('Order ID extracted:', orderId);
+    
     clearCart();
+    console.log('✅ Cart cleared');
+    
     sessionStorage.removeItem('directBuyData');
+    console.log('✅ DirectBuyData cleared');
     
     // Redirect to success page
-    window.location.href = "/success?payment_gateway=shiprocket&order_id=" + (response?.order_id || response?.orderId || 'success');
+    const successUrl = `/success?payment_gateway=shiprocket&order_id=${orderId}`;
+    console.log('Redirecting to:', successUrl);
+    console.log('═══════════════════════════════════════════════════════════');
+    
+    window.location.href = successUrl;
   };
 
   const handleShiprocketError = (error: any) => {
-    console.error('❌ Shiprocket checkout error:', error);
+    console.log('═══════════════════════════════════════════════════════════');
+    console.error('❌ [Checkout Page] SHIPROCKET ERROR');
+    console.error('═══════════════════════════════════════════════════════════');
+    console.error('Error Type:', typeof error);
+    console.error('Error Constructor:', error?.constructor?.name);
+    console.error('Error Message:', error?.message);
+    console.error('Full Error:', error);
+    console.error('Error Keys:', Object.keys(error || {}));
+    
+    if (error instanceof Error) {
+      console.error('Error Stack:', error.stack);
+    }
+    console.error('═══════════════════════════════════════════════════════════');
+    
     toast.error('Checkout failed. Please try again.');
   };
 
   const handleShiprocketCancel = () => {
-    console.log('User cancelled Shiprocket checkout');
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('⏸️  [Checkout Page] USER CANCELLED CHECKOUT');
+    console.log('═══════════════════════════════════════════════════════════');
   };
 
   const cartCount = cartItems.length;
