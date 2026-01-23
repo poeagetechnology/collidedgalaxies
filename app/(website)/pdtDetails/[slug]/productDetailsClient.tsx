@@ -241,17 +241,29 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
       return;
     }
 
-    const selectedColorObj =
-      product?.colors?.find((c: any) =>
-        typeof c === 'string'
-          ? c === selectedColor
-          : c.hex === selectedColor
-      ) ||
-      (product?.colors?.[0]
-        ? (typeof product.colors[0] === 'string'
-          ? { name: product.colors[0], hex: product.colors[0] }
-          : product.colors[0])
-        : { name: 'Default', hex: '#ECE9E6' });
+    let selectedColorObj: any = undefined;
+    if (product?.colors && product.colors.length > 0) {
+      selectedColorObj = product.colors.find((c: any) => {
+        if (typeof c === 'string') {
+          return c === selectedColor;
+        } else if (c && typeof c === 'object' && 'hex' in c && typeof c.hex === 'string') {
+          return c.hex === selectedColor;
+        }
+        return false;
+      });
+      if (!selectedColorObj) {
+        const first = product.colors[0];
+        if (typeof first === 'string') {
+          selectedColorObj = { name: first, hex: first };
+        } else if (first && typeof first === 'object') {
+          selectedColorObj = first;
+        } else {
+          selectedColorObj = { name: 'Default', hex: '#ECE9E6' };
+        }
+      }
+    } else {
+      selectedColorObj = { name: 'Default', hex: '#ECE9E6' };
+    }
 
     setIsAddingToCart(true);
 
@@ -332,6 +344,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
   const handleShiprocketCheckout = async () => {
     if (!product || !selectedSize || !selectedColor) {
       toast.error('Please select size and color');
+      console.log('[Shiprocket Checkout] Missing selection:', { product, selectedSize, selectedColor });
       return;
     }
 
@@ -350,10 +363,70 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         image: productImage,
       };
 
-      // Prepare payload for Shiprocket token API
+
+      // Find the correct variant by color and size (map hex to color name if needed)
+      let selectedColorName: string | undefined = undefined;
+      if (
+        typeof selectedColorObj === 'object' &&
+        selectedColorObj !== null &&
+        'name' in selectedColorObj &&
+        typeof (selectedColorObj as { name?: string }).name === 'string'
+      ) {
+        selectedColorName = (selectedColorObj as { name: string }).name;
+      } else if (typeof selectedColorObj === 'string') {
+        // If it's a string, try to map hex to color name using product.colors
+        // product.colors may be array of strings or objects with {name, hex}
+        if (Array.isArray(product.colors)) {
+          const colorObj = product.colors.find((c: any) => {
+            if (typeof c === 'object' && c !== null && 'hex' in c && typeof c.hex === 'string') {
+              return c.hex === selectedColorObj;
+            }
+            return false;
+          });
+          if (colorObj && typeof colorObj.name === 'string') {
+            selectedColorName = colorObj.name;
+          } else {
+            // fallback: treat as name
+            selectedColorName = selectedColorObj;
+          }
+        } else {
+          selectedColorName = selectedColorObj;
+        }
+      }
+
+      // Debug: log all variants and selection criteria
+      console.log('[Shiprocket Checkout] Product variants:', product.variants);
+      console.log('[Shiprocket Checkout] Looking for variant with:', { colorName: selectedColorName, size: selectedSize });
+
+      const selectedVariant = product.variants && product.variants.find(
+        (v: any) => {
+          // Match if variant color matches name (Firestore variants use color names)
+          const colorMatch = v.color === selectedColorName;
+          const sizeMatch = v.size === selectedSize;
+          if (!colorMatch || !sizeMatch) {
+            console.log('[Shiprocket Checkout] Variant mismatch:', { v, colorMatch, sizeMatch });
+          }
+          return colorMatch && sizeMatch;
+        }
+      );
+
+      if (!selectedVariant) {
+        console.error('[Shiprocket Checkout] Selected variant not found!', {
+          variants: product.variants,
+          selectedColorName,
+          selectedSize,
+        });
+        toast.error('Selected variant not found');
+        setIsDirectBuying(false);
+        return;
+      }
+
+      console.log('[Shiprocket Checkout] Selected variant:', selectedVariant);
+
+      // Prepare payload for Shiprocket token API with numeric variant_id
       const formattedItems = [
         {
-          variant_id: `${product.id}-${selectedColorObj || 'default'}-${selectedSize}`.toLowerCase().replace(/\s+/g, '-'),
+          variant_id: selectedVariant.numericId,
           quantity,
         },
       ];
@@ -365,7 +438,10 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
         timestamp,
       };
 
+      console.log('[Shiprocket Checkout] Request payload:', requestPayload);
+
       // Call backend to get Shiprocket token
+      console.log('[Shiprocket Checkout] Sending request to /api/shiprocket-access-token with:', requestPayload);
       const tokenResponse = await fetch('/api/shiprocket-access-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -373,10 +449,12 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
       });
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
+        console.error('[Shiprocket Checkout] Shiprocket token API error:', errorText);
         throw new Error(errorText || 'Failed to get Shiprocket token');
       }
       const tokenData = await tokenResponse.json();
       if (!tokenData.token) {
+        console.error('[Shiprocket Checkout] No access token received from Shiprocket:', tokenData);
         throw new Error('No access token received from Shiprocket');
       }
 
