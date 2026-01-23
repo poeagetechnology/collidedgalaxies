@@ -9,8 +9,9 @@ function generateHMAC(payload: string, secretKey: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_SHIPROCKET_API_KEY;
-    const secretKey = process.env.SHIPROCKET_SECRET_KEY;
+    // Hardcoded for local testing
+    const apiKey = 'WqKyuY96wcTPKvaY';
+    const secretKey = 'IHsXWv46qfyvTY7RJsuVKktoOIvbsN5t';
     const apiUrl = 'https://checkout-api.shiprocket.com/api/v1/access-token/checkout';
 
     if (!apiKey || !secretKey) {

@@ -895,6 +895,7 @@ export default function ProductDetailsClient({ initialProduct, slug }: ProductDe
                   cartItems={[directBuyItem]}
                   shiprocketToken={shiprocketToken}
                   shiprocketOrderId={shiprocketOrderId}
+                  sellerId="5761789"
                   onSuccess={() => {
                     console.log('✅ Shiprocket checkout successful');
                     toast.success('Order placed successfully!');
