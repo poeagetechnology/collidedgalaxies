@@ -1,0 +1,113 @@
+// Firestore Security Rules - Guest Order Management System
+// Copy these rules to Firebase Console: Firestore Database > Rules tab
+// Instructions:
+// 1. Go to https://console.firebase.google.com
+// 2. Select your project
+// 3. Go to Firestore Database > Rules
+// 4. Replace ALL content with the rules below
+// 5. Click "Publish"
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin(userId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(userId)).data.get('role') == 'admin';
+    }
+
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
+    match /users/{userId} {
+      // Authenticated users can read/write their own document
+      allow read, write: if isOwner(userId);
+
+      // Allow unauthenticated users to read guest accounts (identified by isGuest flag)
+      // Guest account IDs are deterministically hashed from phone numbers
+      allow read: if request.auth == null && resource.data.get('isGuest') == true;
+
+      // Nested subcollections
+      match /{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ============================================
+    // ORDERS COLLECTION
+    // ============================================
+    match /orders/{orderId} {
+      // Authenticated users can read their own orders
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+
+      // Guest users can read orders marked as guest orders
+      // The frontend uses guestUID from hashed phone number
+      allow read: if request.auth == null && resource.data.get('isGuest') == true;
+
+      // Allow creating orders (both authenticated and guest)
+      allow create: if isAuthenticated() ||
+                       (request.auth == null &&
+                        request.resource.data.get('isGuest') == true &&
+                        request.resource.data.get('userId') != null);
+
+      // Allow updating own orders (authenticated)
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+
+      // Allow updating guest orders
+      allow update: if request.auth == null &&
+                       resource.data.get('isGuest') == true &&
+                       resource.data.get('userId') != null;
+
+      // Admin can read/update all orders
+      allow read: if isAuthenticated() && isAdmin(request.auth.uid);
+      allow update: if isAuthenticated() && isAdmin(request.auth.uid);
+      allow delete: if isAuthenticated() && isAdmin(request.auth.uid);
+    }
+
+    // ============================================
+    // PUBLIC COLLECTIONS (Read-only)
+    // ============================================
+    match /products/{document=**} {
+      allow read: if true;
+    }
+
+    match /categories/{document=**} {
+      allow read: if true;
+    }
+
+    match /settings/{document=**} {
+      allow read: if true;
+    }
+
+    match /media/{document=**} {
+      allow read: if true;
+    }
+
+    match /coupons/{document=**} {
+      allow read: if true;
+    }
+
+    // ============================================
+    // ADMIN COLLECTIONS
+    // ============================================
+    match /admin/{document=**} {
+      allow read, write: if isAuthenticated() && isAdmin(request.auth.uid);
+    }
+
+    // ============================================
+    // DEFAULT - DENY ALL
+    // ============================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

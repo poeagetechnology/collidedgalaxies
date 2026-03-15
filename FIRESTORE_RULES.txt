@@ -1,0 +1,111 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- HELPER FUNCTIONS ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin" || 
+         request.auth.token.admin == true);
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // --- COLLECTIONS ---
+
+    // Products & Categories - Public read, Admin write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if true; // TEMPORARY: allow anyone to write for migration. REVERT after migration!
+    }
+    
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Media & Announcements
+    match /media/{documentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      
+      match /{subcollection=**}/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    // Testimonials - Public read for approved, authenticated users can create
+    match /testimonials/{testimonialId} {
+      allow read: if resource.data.approved == true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());
+    }
+
+    // Customers
+    match /customers/{customerId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // User Carts (Legacy & Nested)
+    match /userCarts/{cartId} {
+      allow read, write: if isOwner(cartId);
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+
+      match /cart/{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      match /userReviews/{reviewId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Central Reviews
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow delete: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());
+    }
+
+    // Orders - Allow signed-in users and service account (backend API)
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() || request.auth == null;
+      allow update: if isSignedIn() || request.auth == null;
+      allow delete: if isAdmin();
+    }
+
+    // Direct Buys - User can create/read/update/delete their own
+    match /directBuys/{directBuyId} {
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    // Newsletters - Allow anyone to subscribe, admin can manage
+    match /newsletters/{documentId} {
+      allow create: if true;
+      allow read, delete: if isAdmin();
+    }
+
+    // --- GLOBAL DENY (must be last) ---
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
