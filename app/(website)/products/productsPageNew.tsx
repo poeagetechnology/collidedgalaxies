@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import Navbar from "../../../src/components/header";
 import Footer from "../../../src/components/footer";
-import BundleSection from "../../../src/components/bundles/bundleSection";
+// DISABLED: Bundle section import
+// import BundleSection from "../../../src/components/bundles/bundleSection";
 
 type Product = {
   id: string;
@@ -726,7 +727,8 @@ export default function ProductsPageNew() {
         </div>
       </div>
 
-      <BundleSection />
+      {/* DISABLED: Bundle section */}
+      {/* <BundleSection /> */}
       <Footer />
     </div>
   );

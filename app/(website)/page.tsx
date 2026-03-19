@@ -3,11 +3,13 @@
 import { motion } from "framer-motion";
 import Navbar from "../../src/components/header";
 import OfferScroller from "../../src/components/offerScroller";
-import BundleOfferPopup from "../../src/components/bundleOfferPopup";
+// DISABLED: Bundle popup import
+// import BundleOfferPopup from "../../src/components/bundleOfferPopup";
 import HeroSection from "../../src/components/hero";
 import NewThisWeek from "../../src/components/newthisweek";
 import Plains from "../../src/components/plains";
-import BundleSection from "../../src/components/bundles/bundleSection";
+// DISABLED: Bundle section import
+// import BundleSection from "../../src/components/bundles/bundleSection";
 import ApproachSection from "../../src/components/approachSection";
 import QuoteSection from "../../src/components/saying";
 import CollectionsSection from "../../src/components/collections";
@@ -29,9 +31,11 @@ export default function Home() {
     >
       <Navbar />
       <OfferScroller />
-      <BundleOfferPopup />
+      {/* DISABLED: Bundle popup */}
+      {/* <BundleOfferPopup /> */}
       <HeroSection />
-      <BundleSection limit={3} />
+      {/* DISABLED: Bundle section */}
+      {/* <BundleSection limit={3} /> */}
       <NewThisWeek />
       <Plains />
       <ApproachSection />
