@@ -55,7 +55,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.clarity.ms https://connect.facebook.net; img-src 'self' data: https: https://www.facebook.com https://www.clarity.ms; connect-src 'self' https://www.clarity.ms;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.clarity.ms https://connect.facebook.net https://va.vercel-scripts.com https://scripts.clarity.ms https://apis.google.com; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: https: blob:; connect-src 'self' https://firestore.googleapis.com https://www.googletagmanager.com https://www.clarity.ms https://k.clarity.ms https://www.google-analytics.com https://analytics.google.com https://connect.facebook.net https://mpc2-prod-24-is5qnl632q-uw.a.run.app https://demo-1.conversionsapigateway.com https://va.vercel-scripts.com https://www.facebook.com; font-src 'self' data: https:; frame-src 'self' https://www.facebook.com https://*.firebaseapp.com;",
           },
         ],
       },
